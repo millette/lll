@@ -8,7 +8,7 @@ import getDb from "."
 
 test("create and destroy", async (t) => {
   const db = await getDb("./test-db/t1", { errorIfExists: true })
-  const tableBobo = db.createTable("bobo")
+  db.createTable("bobo")
   await db.destroy()
   t.pass()
 })
