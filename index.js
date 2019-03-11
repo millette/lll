@@ -37,6 +37,7 @@ const getDb = (loc, options = {}) => {
       this.db = db
       this.name = name
       this.ajv = ajv
+      this.schema = schema
       this.validate = schema ? ajv.compile(schema) : () => true
       this.tr = through.obj((chunk, enc, callback) => {
         if (typeof chunk === "string")
@@ -45,6 +46,10 @@ const getDb = (loc, options = {}) => {
           return callback(null, { ...chunk, key: this.unprefixed(chunk.key) })
         callback(new Error("This is not happening!"))
       })
+    }
+
+    getSchema() {
+      return this.schema
     }
 
     prefixed(k = "") {
@@ -124,6 +129,10 @@ const getDb = (loc, options = {}) => {
       this.ajv = ajv
 
       this.schemas = new Table(this, "_table", schemaSchema)
+    }
+
+    close() {
+      return this.db.close()
     }
 
     getTable(name) {
