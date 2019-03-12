@@ -24,6 +24,7 @@ const getDb = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
   class Table {
     constructor({ db, ajv }, name, schema) {
+      // console.log('TABLE-CTOR', name)
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
@@ -127,7 +128,7 @@ const getDb = (loc, options = {}) => {
       db.off("error", reject)
       this.db = db
       this.ajv = ajv
-
+      this.tables = new Map()
       this.schemas = new Table(this, "_table", schemaSchema)
     }
 
@@ -141,6 +142,11 @@ const getDb = (loc, options = {}) => {
         "string",
         "name argument must be a string."
       )
+      const table = this.tables.get(name)
+      if (table) return table
+      return this.schemas
+        .get(name)
+        .then((schema) => new Table(this, name, schema))
     }
 
     createTable(name, schema) {
@@ -155,7 +161,24 @@ const getDb = (loc, options = {}) => {
           "object",
           "schema argument must be an object."
         )
-      return new Table(this, name, schema)
+
+      if (this.tables.get(name)) throw new Error("Table exists.")
+
+      return this.schemas
+        .get(name)
+        .then(() => {
+          throw new Error("Table exists.")
+        })
+        .catch((e) => {
+          if (e instanceof LevelErrors.NotFoundError) return
+          throw e
+        })
+        .then(() => {
+          const table = new Table(this, name, schema)
+          this.tables.set(name, table)
+          return Promise.all([table, this.schemas.put(name, schema || false)])
+        })
+        .then(([table]) => table)
     }
 
     destroy() {
