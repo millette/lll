@@ -42,3 +42,31 @@ test("create table twice", async (t) => {
   await db.destroy()
   t.pass()
 })
+
+test("create table with schema", async (t) => {
+  const db = await getDb("./test-db/t4", { errorIfExists: true })
+
+  const schema = {
+    properties: {
+      smaller: {
+        type: "number",
+        maximum: 5,
+      },
+    },
+  }
+
+  const table = await db.createTable("bobo", schema)
+  await table.put("thing", { joe: "blow" })
+
+  try {
+    await table.put("thing2", { smaller: "blow" })
+  } catch (e) {
+    t.truthy(e instanceof LevelErrors.WriteError)
+    const ajvError = e.ajv[0]
+    t.is(ajvError.schemaPath, "#/properties/smaller/type")
+    t.is(ajvError.dataPath, ".smaller")
+  }
+
+  await db.destroy()
+  t.pass()
+})
