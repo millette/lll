@@ -2,19 +2,20 @@
 
 // npm
 import test from "ava"
+import LevelErrors from "level-errors"
 
 // self
 import getDb from "."
 
 test("create and destroy", async (t) => {
   const db = await getDb("./test-db/t1", { errorIfExists: true })
-  const table = db.createTable("bobo")
+  const table = await db.createTable("bobo")
   t.is(typeof table, "object")
   await db.destroy()
   t.pass()
 })
 
-test.only("get table schema", async (t) => {
+test("get table schema", async (t) => {
   const db = await getDb("./test-db/t2", { errorIfExists: true })
 
   await db.createTable("bobo")
@@ -28,6 +29,16 @@ test.only("get table schema", async (t) => {
   const table2 = await db2.getTable("bobo")
   t.is(typeof table2, "object")
 
+  t.throwsAsync(() => db2.createTable("bobo"), { message: "Table exists." })
+
   await db2.destroy()
+  t.pass()
+})
+
+test("create table twice", async (t) => {
+  const db = await getDb("./test-db/t3", { errorIfExists: true })
+  await db.createTable("bobo")
+  t.throwsAsync(() => db.createTable("bobo"), { message: "Table exists." })
+  await db.destroy()
   t.pass()
 })
