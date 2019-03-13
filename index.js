@@ -64,7 +64,7 @@ const getDb = (loc, options = {}) => {
           // console.log('Do not care for', b, this.name)
         }
 
-        this.emit("put", b, c)
+        // this.emit("put", b, c)
       })
 
       this.ajv = ajv
