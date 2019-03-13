@@ -102,17 +102,15 @@ test("create table with bad schema", async (t) => {
   t.pass()
 })
 
-test.cb("db closing event", (t) => {
+test("db closing event", (t) => {
   t.plan(1)
-  getDb("./test-db/t6", { errorIfExists: true })
-    .then((db) => {
-      db.on("closing", () => t.pass())
-      return db.destroy()
-    })
-    .then(() => t.end())
+  return getDb("./test-db/t6", { errorIfExists: true }).then((db) => {
+    db.on("closing", () => t.pass())
+    return db.destroy()
+  })
 })
 
-test.cb("table closing event", (t) => {
+test("table closing event", (t) => {
   const schema = {
     properties: {
       smaller: {
@@ -123,16 +121,15 @@ test.cb("table closing event", (t) => {
   }
 
   t.plan(1)
-  getDb("./test-db/t7", { errorIfExists: true })
+  return getDb("./test-db/t7", { errorIfExists: true })
     .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
     .then(([db, table]) => {
       table.on("closing", () => t.pass())
       return db.destroy()
     })
-    .then(() => t.end())
 })
 
-test.cb("table put event", (t) => {
+test("table put event", (t) => {
   const schema = {
     properties: {
       smaller: {
@@ -143,12 +140,11 @@ test.cb("table put event", (t) => {
   }
 
   t.plan(1)
-  getDb("./test-db/t8", { errorIfExists: true })
+  return getDb("./test-db/t8", { errorIfExists: true })
     .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
     .then(([db, table]) => {
       table.on("put", (k, v) => t.is(k, "it"))
       return Promise.all([db, table.put("it", { want: "more" })])
     })
     .then(([db]) => db.destroy())
-    .then(() => t.end())
 })
