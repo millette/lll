@@ -154,7 +154,6 @@ const getDb = (loc, options = {}) => {
     }
 
     on(a, b, c, d) {
-      // console.log('ON', a, b, c, d)
       return this.db.on(a, b, c, d)
     }
 
@@ -168,6 +167,10 @@ const getDb = (loc, options = {}) => {
 
     close() {
       return this.db.close()
+    }
+
+    async tablesStream() {
+      return this.schemas.createReadStream()
     }
 
     async getTable(name) {
