@@ -48,23 +48,12 @@ const getDb = (loc, options = {}) => {
       )
       super()
       this.db = db
-
       this.name = name
-
       this.db.on("closing", () => this.emit("closing"))
-
       this.db.on("put", (b, c) => {
-        // console.log('PUT', b, c, this.name, this.unprefixed(b))
-        // this.emit('put', this.unprefixed(b), c)
-        // console.log('PUT', b, c, this.name)
-
         try {
           this.emit("put", this.unprefixed(b), c)
-        } catch (e) {
-          // console.log('Do not care for', b, this.name)
-        }
-
-        // this.emit("put", b, c)
+        } catch (e) {}
       })
 
       this.ajv = ajv
