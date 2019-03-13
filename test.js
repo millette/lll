@@ -111,3 +111,23 @@ test.cb("db closing event", (t) => {
     })
     .then(() => t.end())
 })
+
+test.cb("table closing event", (t) => {
+  const schema = {
+    properties: {
+      smaller: {
+        type: "number",
+        maximum: 5,
+      },
+    },
+  }
+
+  t.plan(1)
+  getDb("./test-db/t7", { errorIfExists: true })
+    .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
+    .then(([db, table]) => {
+      table.on("closing", () => t.pass())
+      return db.destroy()
+    })
+    .then(() => t.end())
+})
