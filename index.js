@@ -1,8 +1,10 @@
 "use strict"
 
 // core
+// const { promisify, inherits } = require("util")
 const { promisify } = require("util")
 const assert = require("assert").strict
+const { EventEmitter } = require("events")
 
 // npm
 const levelup = require("levelup")
@@ -15,6 +17,16 @@ const localize = require("ajv-i18n/localize/fr")
 const mkdir = require("make-dir")
 const schemaSchema = require("ajv/lib/refs/json-schema-secure.json")
 
+/*
+class LevelupMine extends levelup {
+  emit(a, b, c, d) {
+    // console.log('EMIT', a, b, c, d)
+    super.emit('*', a)
+    return super.emit(a, b, c, d)
+  }
+}
+*/
+
 const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
 const POST_END = "\ufff0"
@@ -22,7 +34,7 @@ const defaultAjv = { allErrors: true, verbose: true }
 
 const getDb = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
-  class Table {
+  class Table extends EventEmitter {
     constructor({ db, ajv }, name, schema) {
       assert(
         db instanceof levelup,
@@ -34,8 +46,27 @@ const getDb = (loc, options = {}) => {
         "string",
         "name argument must be a string."
       )
+      super()
       this.db = db
+
       this.name = name
+
+      this.db.on("closing", () => this.emit("closing"))
+
+      this.db.on("put", (b, c) => {
+        // console.log('PUT', b, c, this.name, this.unprefixed(b))
+        // this.emit('put', this.unprefixed(b), c)
+        // console.log('PUT', b, c, this.name)
+
+        try {
+          this.emit("put", this.unprefixed(b), c)
+        } catch (e) {
+          // console.log('Do not care for', b, this.name)
+        }
+
+        this.emit("put", b, c)
+      })
+
       this.ajv = ajv
       this.schema = schema
       this.validate = schema ? ajv.compile(schema) : () => true
@@ -109,7 +140,7 @@ const getDb = (loc, options = {}) => {
     }
   }
 
-  class Tada {
+  class Tada extends EventEmitter {
     constructor(db, reject, ajv) {
       assert(
         db instanceof levelup,
@@ -124,11 +155,26 @@ const getDb = (loc, options = {}) => {
         !ajv || ajv instanceof Ajv,
         "ajv argument must be an instance of Ajv."
       )
+
       db.off("error", reject)
+      super()
       this.db = db
       this.ajv = ajv
       this.tables = new Map()
       this.schemas = new Table(this, "_table", schemaSchema)
+    }
+
+    on(a, b, c, d) {
+      // console.log('ON', a, b, c, d)
+      return this.db.on(a, b, c, d)
+    }
+
+    once(a, b, c, d) {
+      return this.db.once(a, b, c, d)
+    }
+
+    off(a, b, c, d) {
+      return this.db.off(a, b, c, d)
     }
 
     close() {
@@ -200,6 +246,7 @@ const getDb = (loc, options = {}) => {
       db.open(levelOptions, (e) => {
         if (e) return reject(e)
         db.close(() => {
+          // const db2 = new LevelupMine(encode(db, { valueEncoding: "json" }))
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
           const ok = () => resolve(new Tada(db2, reject, new Ajv(ajvOptions)))
           db2.once("ready", ok)
