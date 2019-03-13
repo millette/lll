@@ -46,7 +46,7 @@ test("create table twice", async (t) => {
   t.pass()
 })
 
-test.only("create table with schema", async (t) => {
+test("create table with schema", async (t) => {
   const db = await getDb("./test-db/t4", { errorIfExists: true })
 
   // db.on('*', (ev) => console.log('EVENT:', ev))
@@ -100,4 +100,14 @@ test("create table with bad schema", async (t) => {
 
   await db.destroy()
   t.pass()
+})
+
+test.cb("db closing event", (t) => {
+  t.plan(1)
+  getDb("./test-db/t6", { errorIfExists: true })
+    .then((db) => {
+      db.on("closing", () => t.pass())
+      return db.destroy()
+    })
+    .then(() => t.end())
 })
