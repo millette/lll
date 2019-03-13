@@ -227,7 +227,6 @@ const getDb = (loc, options = {}) => {
       db.open(levelOptions, (e) => {
         if (e) return reject(e)
         db.close(() => {
-          // const db2 = new LevelupMine(encode(db, { valueEncoding: "json" }))
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
           const ok = () => resolve(new Tada(db2, reject, new Ajv(ajvOptions)))
           db2.once("ready", ok)

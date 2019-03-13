@@ -179,30 +179,27 @@ test("table stream", (t) => {
     .then((db) => db.destroy())
 })
 
-test.only("db stream", (t) => {
-  t.plan(2)
+test("tables stream", (t) => {
+  t.plan(3)
   return getDb("./test-db/t10", { errorIfExists: true })
     .then((db) =>
       Promise.all([db, db.createTable("bobo"), db.createTable("baba")])
     )
-    .then(([db, table1, table2]) =>
-      Promise.all([
-        db,
-        table1.put("it", { want: "more1" }),
-        table2.put("that", { want: "more2" }),
-        table1.put("stuff", { want: "more3" }),
-      ])
-    )
     .then(
       ([db]) =>
-        new Promise((resolve) =>
-          db
-            .tablesStream()
-            .on("data", (a, b, c) => {
-              console.log("DATA", a, b, c)
+        new Promise(async (resolve) => {
+          const ret = []
+          const str = await db.tablesStream()
+          str
+            .on("data", ({ key }) => {
+              ret.push(key)
+              t.pass()
             })
-            .once("end", () => resolve(db))
-        )
+            .once("end", () => {
+              t.deepEqual(ret, ["baba", "bobo"])
+              resolve(db)
+            })
+        })
     )
     .then((db) => db.destroy())
 })
