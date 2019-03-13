@@ -20,11 +20,12 @@ const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
 const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
+const prefixRe = /^[a-z]+$/
 
-const getDb = (loc, options = {}) => {
+module.exports = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
   class Table extends EventEmitter {
-    constructor({ db, ajv }, name, schema) {
+    constructor({ db, ajv }, name, schema = {}) {
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
@@ -39,29 +40,37 @@ const getDb = (loc, options = {}) => {
       this.db = db
       this.name = name
       this.db.on("closing", () => this.emit("closing"))
-      this.db.on("put", (b, c) => {
+      this.db.on("put", (key, value) => {
         try {
-          this.emit("put", this.unprefixed(b), c)
+          this.emit("put", this.unprefixed(key), value)
         } catch (e) {}
       })
 
       this.ajv = ajv
       this.schema = schema
-      this.validate = schema ? ajv.compile(schema) : () => true
+      // console.log('NAME, SCHEMA', name, schema)
+      // this.validate = schema ? ajv.compile(schema) : () => true
+      this.validate = ajv.compile(schema)
       this.tr = through.obj((chunk, enc, callback) => {
+        // istanbul ignore next
         if (typeof chunk === "string")
           return callback(null, this.unprefixed(chunk))
+        // istanbul ignore next
         if (typeof chunk === "object")
           return callback(null, { ...chunk, key: this.unprefixed(chunk.key) })
+        // istanbul ignore next
         callback(new Error("This is not happening!"))
       })
     }
 
+    /*
     getSchema() {
       return this.schema
     }
+    */
 
     prefixed(k = "") {
+      // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.OpenError()
       return `${this.name}:${k}`
     }
@@ -74,6 +83,7 @@ const getDb = (loc, options = {}) => {
     }
 
     put(k, v) {
+      // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (!this.validate(v)) {
         localize(this.validate.errors)
@@ -87,16 +97,21 @@ const getDb = (loc, options = {}) => {
     }
 
     get(k) {
+      // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.ReadError()
       return this.db.get(this.prefixed(k))
     }
 
     _createReadStream(options) {
+      // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.ReadError()
       itKeys.forEach((k) => {
+        // istanbul ignore next
         if (options[k]) options[k] = this.prefixed(options[k])
       })
+      // istanbul ignore next
       if (!options.gte) options.gte = this.prefixed()
+      // istanbul ignore next
       if (!options.lte) options.lte = this.prefixed(POST_END)
       return this.db.createReadStream(options)
     }
@@ -105,6 +120,7 @@ const getDb = (loc, options = {}) => {
       return this._createReadStream(options).pipe(this.tr)
     }
 
+    /*
     createKeyStream(options = {}) {
       return this._createReadStream({
         ...options,
@@ -112,10 +128,13 @@ const getDb = (loc, options = {}) => {
         values: false,
       }).pipe(this.tr)
     }
+    */
 
+    /*
     createValueStream(options = {}) {
       return this._createReadStream({ ...options, keys: false, values: true })
     }
+    */
   }
 
   class Tada extends EventEmitter {
@@ -146,13 +165,17 @@ const getDb = (loc, options = {}) => {
       return this.db.on(a, b, c, d)
     }
 
+    /*
     once(a, b, c, d) {
       return this.db.once(a, b, c, d)
     }
+    */
 
+    /*
     off(a, b, c, d) {
       return this.db.off(a, b, c, d)
     }
+    */
 
     close() {
       return this.db.close()
@@ -188,6 +211,10 @@ const getDb = (loc, options = {}) => {
           "schema argument must be an object."
         )
 
+      // istanbul ignore next
+      if (!prefixRe.test(name))
+        throw new Error("name argument must match ^[a-z]+$")
+
       if (this.tables.get(name)) throw new Error("Table exists.")
 
       return this.schemas
@@ -217,7 +244,9 @@ const getDb = (loc, options = {}) => {
       const db = leveldown(loc)
       let levelOptions
       const { level, ajv, ...rest } = options
+      // istanbul ignore next
       if (!level && !ajv) levelOptions = rest
+      // istanbul ignore next
       if (level) levelOptions = level
       const ajvOptions = {
         ...defaultAjv,
@@ -225,11 +254,13 @@ const getDb = (loc, options = {}) => {
       }
 
       db.open(levelOptions, (e) => {
+        // istanbul ignore next
         if (e) return reject(e)
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
           const ok = () => resolve(new Tada(db2, reject, new Ajv(ajvOptions)))
           db2.once("ready", ok)
+          // istanbul ignore next
           db2.once("error", (err) => {
             db2.off("ready", ok)
             reject(err)
@@ -240,5 +271,3 @@ const getDb = (loc, options = {}) => {
 
   return mkdir(loc).then(gogo)
 }
-
-module.exports = getDb

@@ -25,7 +25,7 @@ test("get table schema", async (t) => {
 
   await db.close()
 
-  const db2 = await getDb("./test-db/t2", { errorIfExists: false })
+  const db2 = await getDb("./test-db/t2")
   const table2 = await db2.getTable("bobo")
   t.is(typeof table2, "object")
 
