@@ -1,7 +1,6 @@
 "use strict"
 
 // core
-// const { promisify, inherits } = require("util")
 const { promisify } = require("util")
 const assert = require("assert").strict
 const { EventEmitter } = require("events")
@@ -16,16 +15,6 @@ const Ajv = require("ajv")
 const localize = require("ajv-i18n/localize/fr")
 const mkdir = require("make-dir")
 const schemaSchema = require("ajv/lib/refs/json-schema-secure.json")
-
-/*
-class LevelupMine extends levelup {
-  emit(a, b, c, d) {
-    // console.log('EMIT', a, b, c, d)
-    super.emit('*', a)
-    return super.emit(a, b, c, d)
-  }
-}
-*/
 
 const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
