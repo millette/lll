@@ -13,18 +13,17 @@ const through = require("through2")
 const Ajv = require("ajv")
 const localize = require("ajv-i18n/localize/fr")
 const mkdir = require("make-dir")
+const schemaSchema = require("ajv/lib/refs/json-schema-secure.json")
 
 const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
 const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
-const schemaSchema = {}
 
 const getDb = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
   class Table {
     constructor({ db, ajv }, name, schema) {
-      // console.log('TABLE-CTOR', name)
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
@@ -136,7 +135,7 @@ const getDb = (loc, options = {}) => {
       return this.db.close()
     }
 
-    getTable(name) {
+    async getTable(name) {
       assert.equal(
         name && typeof name,
         "string",
@@ -149,7 +148,7 @@ const getDb = (loc, options = {}) => {
         .then((schema) => new Table(this, name, schema))
     }
 
-    createTable(name, schema) {
+    async createTable(name, schema) {
       assert.equal(
         name && typeof name,
         "string",
