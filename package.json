@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "healthier && nyc ava"
+    "test": "healthier && nyc ava",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": {
     "name": "Robin Millette",
