@@ -18,6 +18,9 @@ test("create and destroy", async (t) => {
 test("get table schema", async (t) => {
   const db = await getDb("./test-db/t2", { errorIfExists: true })
 
+  // db.on('*', (ev) => console.log('EVENT:', ev))
+  // db.on('put', (b, c) => console.log('EVENT-PUT:', b, c))
+
   await db.createTable("bobo")
 
   const table = await db.getTable("bobo")
@@ -43,8 +46,10 @@ test("create table twice", async (t) => {
   t.pass()
 })
 
-test("create table with schema", async (t) => {
+test.only("create table with schema", async (t) => {
   const db = await getDb("./test-db/t4", { errorIfExists: true })
+
+  // db.on('*', (ev) => console.log('EVENT:', ev))
 
   const schema = {
     properties: {
@@ -56,6 +61,11 @@ test("create table with schema", async (t) => {
   }
 
   const table = await db.createTable("bobo", schema)
+
+  db.on("closing", (ev) => console.log("CLOSING DB"))
+  table.on("closing", (ev) => console.log("CLOSING TABLE"))
+  table.on("put", (b, c) => console.log("TABLE-PUT:", b, c))
+
   await table.put("thing", { joe: "blow" })
 
   try {
