@@ -70,3 +70,24 @@ test("create table with schema", async (t) => {
   await db.destroy()
   t.pass()
 })
+
+test("create table with bad schema", async (t) => {
+  const db = await getDb("./test-db/t5", { errorIfExists: true })
+
+  const schema = {
+    properties: {
+      smaller: {
+        type: "number",
+        maximum: { $data: "1/larger" },
+      },
+    },
+  }
+
+  t.throwsAsync(() => db.createTable("bobo", schema), {
+    message:
+      "schema is invalid: data.properties['smaller'].maximum should be number",
+  })
+
+  await db.destroy()
+  t.pass()
+})
