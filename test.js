@@ -148,3 +148,43 @@ test("table put event", (t) => {
     })
     .then(([db]) => db.destroy())
 })
+
+test("table stream", (t) => {
+  t.plan(2)
+  return getDb("./test-db/t9", { errorIfExists: true })
+    .then((db) =>
+      Promise.all([db, db.createTable("bobo"), db.createTable("baba")])
+    )
+    .then(([db, table1, table2]) =>
+      Promise.all([
+        db,
+        table1,
+        table1.put("it", { want: "more1" }),
+        table2.put("that", { want: "more2" }),
+        table1.put("stuff", { want: "more3" }),
+      ])
+    )
+    .then(
+      ([db, table]) =>
+        new Promise((resolve) =>
+          table
+            .createReadStream()
+            .on("data", ({ key, value }) => {
+              switch (key) {
+                case "it":
+                  t.is(value.want, "more1")
+                  break
+
+                case "stuff":
+                  t.is(value.want, "more3")
+                  break
+
+                default:
+                  t.fail()
+              }
+            })
+            .once("end", () => resolve(db))
+        )
+    )
+    .then((db) => db.destroy())
+})
