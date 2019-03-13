@@ -131,3 +131,24 @@ test.cb("table closing event", (t) => {
     })
     .then(() => t.end())
 })
+
+test.cb("table put event", (t) => {
+  const schema = {
+    properties: {
+      smaller: {
+        type: "number",
+        maximum: 5,
+      },
+    },
+  }
+
+  t.plan(1)
+  getDb("./test-db/t8", { errorIfExists: true })
+    .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
+    .then(([db, table]) => {
+      table.on("put", (k, v) => t.is(k, "it"))
+      return Promise.all([db, table.put("it", { want: "more" })])
+    })
+    .then(([db]) => db.destroy())
+    .then(() => t.end())
+})
