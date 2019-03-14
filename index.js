@@ -22,9 +22,19 @@ const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
 const prefixRe = /^[a-z]+$/
 
-module.exports = (loc, options = {}) => {
+/**
+ * Initiate a database.
+ * @param {string} loc database directory location
+ * @param {object} options level and ajv options
+ * @returns {object} db instance
+ */
+const getDb = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
+  /** Class representing a table. */
   class Table extends EventEmitter {
+    /**
+     * Create table
+     */
     constructor({ db, ajv }, name, schema = {}) {
       assert(
         db instanceof levelup,
@@ -82,6 +92,7 @@ module.exports = (loc, options = {}) => {
       return b
     }
 
+    /** Put item in table. */
     put(k, v) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
@@ -96,6 +107,7 @@ module.exports = (loc, options = {}) => {
       return this.db.put(this.prefixed(k), v)
     }
 
+    /** Get item from table. */
     get(k) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.ReadError()
@@ -116,6 +128,7 @@ module.exports = (loc, options = {}) => {
       return this.db.createReadStream(options)
     }
 
+    /** Create readable stream. */
     createReadStream(options = {}) {
       return this._createReadStream(options).pipe(this.tr)
     }
@@ -137,7 +150,14 @@ module.exports = (loc, options = {}) => {
     */
   }
 
+  /** Database class. */
   class Tada extends EventEmitter {
+    /**
+     * Create a Database instance.
+     * @param {object} db
+     * @param {function} reject
+     * @param {object} ajv
+     */
     constructor(db, reject, ajv) {
       assert(
         db instanceof levelup,
@@ -161,6 +181,9 @@ module.exports = (loc, options = {}) => {
       this.schemas = new Table(this, "_table", schemaSchema)
     }
 
+    /**
+     * Add event listener.
+     */
     on(a, b, c, d) {
       return this.db.on(a, b, c, d)
     }
@@ -177,14 +200,17 @@ module.exports = (loc, options = {}) => {
     }
     */
 
+    /** Close database. */
     close() {
       return this.db.close()
     }
 
+    /** Return stream of tables. */
     async tablesStream() {
       return this.schemas.createReadStream()
     }
 
+    /** Return table by name. */
     async getTable(name) {
       assert.equal(
         name && typeof name,
@@ -198,6 +224,7 @@ module.exports = (loc, options = {}) => {
         .then((schema) => new Table(this, name, schema))
     }
 
+    /** Create table. */
     async createTable(name, schema) {
       assert.equal(
         name && typeof name,
@@ -234,6 +261,7 @@ module.exports = (loc, options = {}) => {
         .then(([table]) => table)
     }
 
+    /** Destroy database. */
     destroy() {
       return this.db.close().then(() => leveldownDestroy(loc))
     }
@@ -271,3 +299,5 @@ module.exports = (loc, options = {}) => {
 
   return mkdir(loc).then(gogo)
 }
+
+module.exports = getDb
