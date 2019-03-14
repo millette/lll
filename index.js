@@ -210,7 +210,11 @@ const getDb = (loc, options = {}) => {
       return this.schemas.createReadStream()
     }
 
-    /** Return table by name. */
+    /**
+     * Return table by name.
+     * @param {string} name
+     * @returns {Table}
+     */
     async getTable(name) {
       assert.equal(
         name && typeof name,
@@ -224,7 +228,12 @@ const getDb = (loc, options = {}) => {
         .then((schema) => new Table(this, name, schema))
     }
 
-    /** Create table. */
+    /**
+     * Create table.
+     * @param {string} name
+     * @param {object} schema
+     * @returns {Table}
+     */
     async createTable(name, schema) {
       assert.equal(
         name && typeof name,

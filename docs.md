@@ -111,7 +111,9 @@ Return table by name.
 
 #### Parameters
 
-- `name`
+- `name` **[string][22]**
+
+Returns **[Table][25]**
 
 ### createTable
 
@@ -119,8 +121,10 @@ Create table.
 
 #### Parameters
 
-- `name`
-- `schema`
+- `name` **[string][22]**
+- `schema` **[object][23]**
+
+Returns **[Table][25]**
 
 ### destroy
 
@@ -150,3 +154,4 @@ Destroy database.
 [22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 [23]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 [24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[25]: #table
