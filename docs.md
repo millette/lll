@@ -12,17 +12,21 @@
     - [Parameters][8]
   - [createReadStream][9]
     - [Parameters][10]
-- [Tada][11]
+- [UserTable][11]
   - [Parameters][12]
-  - [on][13]
+  - [put][13]
     - [Parameters][14]
-  - [close][15]
-  - [tablesStream][16]
-  - [getTable][17]
+- [Tada][15]
+  - [Parameters][16]
+  - [on][17]
     - [Parameters][18]
-  - [createTable][19]
-    - [Parameters][20]
-  - [destroy][21]
+  - [close][19]
+  - [tablesStream][20]
+  - [getTable][21]
+    - [Parameters][22]
+  - [createTable][23]
+    - [Parameters][24]
+  - [destroy][25]
 
 ## getDb
 
@@ -30,10 +34,10 @@ Initiate a database.
 
 ### Parameters
 
-- `loc` **[string][22]** database directory location
-- `options` **[object][23]** level and ajv options (optional, default `{}`)
+- `loc` **[string][26]** database directory location
+- `options` **[object][27]** level and ajv options (optional, default `{}`)
 
-Returns **[object][23]** db instance
+Returns **[object][27]** db instance
 
 ## Table
 
@@ -43,7 +47,7 @@ Class representing a table.
 
 ### Parameters
 
-- `$0` **[Object][23]**
+- `$0` **[Object][27]**
   - `$0.db`
   - `$0.ajv`
 - `name`
@@ -74,6 +78,26 @@ Create readable stream.
 
 - `options` (optional, default `{}`)
 
+## UserTable
+
+**Extends Table**
+
+Class representing the user table.
+
+### Parameters
+
+- `parent`
+
+### put
+
+Create user.
+
+#### Parameters
+
+- `v` **[object][27]** user instance, \_id must be the key
+
+Returns **[Promise][28]**
+
 ## Tada
 
 **Extends EventEmitter**
@@ -82,9 +106,9 @@ Database class.
 
 ### Parameters
 
-- `db` **[object][23]**
-- `reject` **[function][24]**
-- `ajv` **[object][23]**
+- `db` **[object][27]**
+- `reject` **[function][29]**
+- `ajv` **[object][27]**
 
 ### on
 
@@ -111,9 +135,9 @@ Return table by name.
 
 #### Parameters
 
-- `name` **[string][22]**
+- `name` **[string][26]**
 
-Returns **[Table][25]**
+Returns **[Table][30]**
 
 ### createTable
 
@@ -121,10 +145,10 @@ Create table.
 
 #### Parameters
 
-- `name` **[string][22]**
-- `schema` **[object][23]**
+- `name` **[string][26]**
+- `schema` **[object][27]**
 
-Returns **[Table][25]**
+Returns **[Table][30]**
 
 ### destroy
 
@@ -140,18 +164,23 @@ Destroy database.
 [8]: #parameters-3
 [9]: #createreadstream
 [10]: #parameters-4
-[11]: #tada
+[11]: #usertable
 [12]: #parameters-5
-[13]: #on
+[13]: #put-1
 [14]: #parameters-6
-[15]: #close
-[16]: #tablesstream
-[17]: #gettable
-[18]: #parameters-7
-[19]: #createtable
-[20]: #parameters-8
-[21]: #destroy
-[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[23]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[25]: #table
+[15]: #tada
+[16]: #parameters-7
+[17]: #on
+[18]: #parameters-8
+[19]: #close
+[20]: #tablesstream
+[21]: #gettable
+[22]: #parameters-9
+[23]: #createtable
+[24]: #parameters-10
+[25]: #destroy
+[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[28]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[29]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[30]: #table
