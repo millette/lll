@@ -6,9 +6,14 @@ import LevelErrors from "level-errors"
 
 // self
 import getDb from "."
+import zaza from "./helpers-test.js"
+
+test.beforeEach(async (t) => {
+  t.context.loc = await zaza()
+})
 
 test("create and destroy", async (t) => {
-  const db = await getDb("./test-db/t1", { errorIfExists: true })
+  const db = await getDb(t.context.loc, { errorIfExists: true })
   const table = await db.createTable("bobo")
   t.is(typeof table, "object")
   await db.destroy()
@@ -16,7 +21,7 @@ test("create and destroy", async (t) => {
 })
 
 test("get table schema", async (t) => {
-  const db = await getDb("./test-db/t2", { errorIfExists: true })
+  const db = await getDb(t.context.loc, { errorIfExists: true })
 
   await db.createTable("bobo")
 
@@ -25,7 +30,7 @@ test("get table schema", async (t) => {
 
   await db.close()
 
-  const db2 = await getDb("./test-db/t2")
+  const db2 = await getDb(t.context.loc)
   const table2 = await db2.getTable("bobo")
   t.is(typeof table2, "object")
 
@@ -36,7 +41,7 @@ test("get table schema", async (t) => {
 })
 
 test("create table twice", async (t) => {
-  const db = await getDb("./test-db/t3", { errorIfExists: true })
+  const db = await getDb(t.context.loc, { errorIfExists: true })
   await db.createTable("bobo")
   t.throwsAsync(() => db.createTable("bobo"), { message: "Table exists." })
   await db.destroy()
@@ -44,7 +49,7 @@ test("create table twice", async (t) => {
 })
 
 test("create table with schema", async (t) => {
-  const db = await getDb("./test-db/t4", { errorIfExists: true })
+  const db = await getDb(t.context.loc, { errorIfExists: true })
 
   const schema = {
     properties: {
@@ -72,7 +77,7 @@ test("create table with schema", async (t) => {
 })
 
 test("create table with bad schema", async (t) => {
-  const db = await getDb("./test-db/t5", { errorIfExists: true })
+  const db = await getDb(t.context.loc, { errorIfExists: true })
 
   const schema = {
     properties: {
@@ -94,7 +99,7 @@ test("create table with bad schema", async (t) => {
 
 test("db closing event", (t) => {
   t.plan(1)
-  return getDb("./test-db/t6", { errorIfExists: true }).then((db) => {
+  return getDb(t.context.loc, { errorIfExists: true }).then((db) => {
     db.on("closing", () => t.pass())
     return db.destroy()
   })
@@ -111,7 +116,7 @@ test("table closing event", (t) => {
   }
 
   t.plan(1)
-  return getDb("./test-db/t7", { errorIfExists: true })
+  return getDb(t.context.loc, { errorIfExists: true })
     .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
     .then(([db, table]) => {
       table.on("closing", () => t.pass())
@@ -130,7 +135,7 @@ test("table put event", (t) => {
   }
 
   t.plan(1)
-  return getDb("./test-db/t8", { errorIfExists: true })
+  return getDb(t.context.loc, { errorIfExists: true })
     .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
     .then(([db, table]) => {
       table.on("put", (k, v) => t.is(k, "it"))
@@ -141,7 +146,7 @@ test("table put event", (t) => {
 
 test("table stream", (t) => {
   t.plan(2)
-  return getDb("./test-db/t9", { errorIfExists: true })
+  return getDb(t.context.loc, { errorIfExists: true })
     .then((db) =>
       Promise.all([db, db.createTable("bobo"), db.createTable("baba")])
     )
@@ -181,7 +186,7 @@ test("table stream", (t) => {
 
 test("tables stream", (t) => {
   t.plan(3)
-  return getDb("./test-db/t10", { errorIfExists: true })
+  return getDb(t.context.loc, { errorIfExists: true })
     .then((db) =>
       Promise.all([db, db.createTable("bobo"), db.createTable("baba")])
     )
