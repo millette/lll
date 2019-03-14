@@ -96,6 +96,20 @@ const getDb = (loc, options = {}) => {
     put(k, v) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
+      if (typeof k === "object") {
+        // istanbul ignore next
+        const idKey = typeof v === "string" ? v : "_id"
+        const key = k[idKey]
+        // istanbul ignore next
+        if (!key) {
+          const err = new Error("Missing _id field.")
+          err.idKey = idKey
+          throw err
+        }
+        v = k
+        k = key
+      }
+
       if (!this.validate(v)) {
         localize(this.validate.errors)
         const err = new LevelErrors.WriteError(
@@ -150,6 +164,33 @@ const getDb = (loc, options = {}) => {
     */
   }
 
+  /** Class representing the user table. */
+  class UserTable extends Table {
+    /**
+     * Create user table
+     */
+    constructor(parent) {
+      super(parent, "_user", {
+        required: ["_id"],
+        properties: {
+          _id: {
+            type: "string",
+            pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+          },
+        },
+      })
+    }
+
+    /**
+     * Create user.
+     * @param {object} v user instance, _id must be the key
+     * @returns {Promise}
+     */
+    put(v) {
+      super.put(v)
+    }
+  }
+
   /** Database class. */
   class Tada extends EventEmitter {
     /**
@@ -179,6 +220,11 @@ const getDb = (loc, options = {}) => {
       this.ajv = ajv
       this.tables = new Map()
       this.schemas = new Table(this, "_table", schemaSchema)
+      this.users = new UserTable(this)
+    }
+
+    getUsers() {
+      return this.users
     }
 
     /**
