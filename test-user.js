@@ -5,11 +5,9 @@ import test from "ava"
 
 // self
 import getDb from "."
-import zaza from "./helpers-test.js"
+import beforeEach from "./helpers-test.js"
 
-test.beforeEach(async (t) => {
-  t.context.loc = await zaza()
-})
+test.beforeEach(beforeEach)
 
 test("create and destroy", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
