@@ -6,9 +6,10 @@ import LevelErrors from "level-errors"
 
 // self
 import getDb from "."
-import beforeEach from "./helpers-test.js"
+import { beforeEach, afterEach } from "./helpers-test.js"
 
 test.beforeEach(beforeEach)
+test.afterEach.always(afterEach)
 
 test("create and destroy", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
@@ -46,7 +47,7 @@ test("create table twice", async (t) => {
   t.pass()
 })
 
-test.only("create table with schema (with idKey)", async (t) => {
+test("create table with schema (with idKey)", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
 
   const schema = {
