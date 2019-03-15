@@ -11,14 +11,6 @@ import { beforeEach, afterEach } from "./helpers-test.js"
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
 
-test("create and destroy", async (t) => {
-  const db = await getDb(t.context.loc, { errorIfExists: true })
-  const table = await db.createTable("bobo")
-  t.is(typeof table, "object")
-  await db.destroy()
-  t.pass()
-})
-
 test("get table schema", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
 
