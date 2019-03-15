@@ -46,6 +46,25 @@ test("create table twice", async (t) => {
   t.pass()
 })
 
+test.only("create table with schema (with idKey)", async (t) => {
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+
+  const schema = {
+    required: ["smaller"],
+    properties: {
+      smaller: {
+        type: "number",
+        maximum: 5,
+      },
+    },
+  }
+
+  const table = await db.createTable("bobo", schema, "smaller")
+  await table.put({ smaller: 4.99 })
+  await db.destroy()
+  t.pass()
+})
+
 test("create table with schema", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
 
