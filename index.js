@@ -35,7 +35,8 @@ const getDb = (loc, options = {}) => {
     /**
      * Create table
      */
-    constructor({ db, ajv }, name, schema = {}) {
+    constructor({ db, ajv }, name, schema = {}, idKey = "_id") {
+      // Todo: check that idKey is required by schema
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
@@ -49,6 +50,7 @@ const getDb = (loc, options = {}) => {
       super()
       this.db = db
       this.name = name
+      this.idKey = idKey
       this.db.on("closing", () => this.emit("closing"))
       this.db.on("put", (key, value) => {
         try {
@@ -98,12 +100,14 @@ const getDb = (loc, options = {}) => {
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
         // istanbul ignore next
-        const idKey = typeof v === "string" ? v : "_id"
-        const key = k[idKey]
+        // const idKey = typeof v === "string" ? v : "_id"
+        // const key = k[idKey]
+        const key = k[this.idKey]
         // istanbul ignore next
         if (!key) {
           const err = new Error("Missing _id field.")
-          err.idKey = idKey
+          // err.idKey = idKey
+          err.idKey = this.idKey
           throw err
         }
         v = k
@@ -280,7 +284,7 @@ const getDb = (loc, options = {}) => {
      * @param {object} schema
      * @returns {Table}
      */
-    async createTable(name, schema) {
+    async createTable(name, schema, idKey) {
       assert.equal(
         name && typeof name,
         "string",
@@ -309,7 +313,7 @@ const getDb = (loc, options = {}) => {
           throw e
         })
         .then(() => {
-          const table = new Table(this, name, schema)
+          const table = new Table(this, name, schema, idKey)
           this.tables.set(name, table)
           return Promise.all([table, this.schemas.put(name, schema || false)])
         })
