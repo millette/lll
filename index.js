@@ -97,7 +97,7 @@ const getDb = (loc, options = {}) => {
     }
 
     /** Put item in table. */
-    put(k, v) {
+    put(k, v, user) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
@@ -126,7 +126,7 @@ const getDb = (loc, options = {}) => {
     }
 
     /** Get item from table. */
-    get(k) {
+    get(k, user) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.ReadError()
       return this.db.get(this.prefixed(k))
