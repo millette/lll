@@ -6,7 +6,7 @@ import LevelErrors from "level-errors"
 
 // self
 import getDb from ".."
-import { beforeEach, afterEach } from "./_helpers.mjs"
+import { beforeEach, afterEach } from "./_helpers"
 
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
