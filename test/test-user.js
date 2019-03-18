@@ -5,7 +5,7 @@ import test from "ava"
 
 // self
 import getDb from "."
-import { beforeEach, afterEach } from "./helpers-test.js"
+import { beforeEach, afterEach } from "./_helpers.js"
 
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
