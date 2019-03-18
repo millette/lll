@@ -51,6 +51,7 @@ const getDb = (loc, options = {}) => {
       this.db = db
       this.name = name
       this.idKey = idKey
+      this.access = access
       this.db.on("closing", () => this.emit("closing"))
       this.db.on("put", (key, value) => {
         try {
@@ -98,6 +99,12 @@ const getDb = (loc, options = {}) => {
 
     /** Put item in table. */
     put(k, v, user) {
+      // console.log('PUT-k', k)
+      // console.log('PUT-v', v)
+      // console.log('PUT-user', user)
+      // console.log('PUT-access', this.access)
+      if (this.access && this.access.put === false)
+        throw new Error("Cannot put.")
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
@@ -230,7 +237,8 @@ const getDb = (loc, options = {}) => {
       this.tables = new Map()
       this.schemas = new Table(this, "_table", { schema: schemaSchema })
       // TODO: Add access
-      this.users = new UserTable(this)
+      const access = {}
+      this.users = new UserTable(this, access)
     }
 
     getUsers() {
@@ -279,9 +287,7 @@ const getDb = (loc, options = {}) => {
       )
       const table = this.tables.get(name)
       if (table) return table
-      return this.schemas
-        .get(name)
-        .then((schema) => new Table(this, name, { schema }))
+      return this.schemas.get(name).then((ret) => new Table(this, name, ret))
     }
 
     /**
