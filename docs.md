@@ -14,19 +14,18 @@
     - [Parameters][10]
 - [UserTable][11]
   - [Parameters][12]
-  - [put][13]
-    - [Parameters][14]
-- [Tada][15]
-  - [Parameters][16]
-  - [on][17]
-    - [Parameters][18]
-  - [close][19]
-  - [tablesStream][20]
-  - [getTable][21]
-    - [Parameters][22]
-  - [createTable][23]
-    - [Parameters][24]
-  - [destroy][25]
+  - [Parameters][13]
+- [Tada][14]
+  - [Parameters][15]
+  - [on][16]
+    - [Parameters][17]
+  - [close][18]
+  - [tablesStream][19]
+  - [getTable][20]
+    - [Parameters][21]
+  - [createTable][22]
+    - [Parameters][23]
+  - [destroy][24]
 
 ## getDb
 
@@ -34,10 +33,10 @@ Initiate a database.
 
 ### Parameters
 
-- `loc` **[string][26]** database directory location
-- `options` **[object][27]** level and ajv options (optional, default `{}`)
+- `loc` **[string][25]** database directory location
+- `options` **[object][26]** level and ajv options (optional, default `{}`)
 
-Returns **[object][27]** db instance
+Returns **[object][26]** db instance
 
 ## Table
 
@@ -47,11 +46,14 @@ Class representing a table.
 
 ### Parameters
 
-- `$0` **[Object][27]**
+- `$0` **[Object][26]**
   - `$0.db`
   - `$0.ajv`
 - `name`
-- `schema` (optional, default `{}`)
+- `$2` **[Object][26]**
+  - `$2.schema`
+  - `$2.idKey` (optional, default `"_id"`)
+  - `$2.access`
 
 ### put
 
@@ -87,16 +89,17 @@ Class representing the user table.
 ### Parameters
 
 - `parent`
+- `access`
 
-### put
+##
 
 Create user.
 
-#### Parameters
+### Parameters
 
-- `v` **[object][27]** user instance, \_id must be the key
+- `v` **[object][26]** user instance, \_id must be the key
 
-Returns **[Promise][28]**
+Returns **[Promise][27]**
 
 ## Tada
 
@@ -106,9 +109,9 @@ Database class.
 
 ### Parameters
 
-- `db` **[object][27]**
-- `reject` **[function][29]**
-- `ajv` **[object][27]**
+- `db` **[object][26]**
+- `reject` **[function][28]**
+- `ajv` **[object][26]**
 
 ### on
 
@@ -135,9 +138,9 @@ Return table by name.
 
 #### Parameters
 
-- `name` **[string][26]**
+- `name` **[string][25]**
 
-Returns **[Table][30]**
+Returns **[Table][29]**
 
 ### createTable
 
@@ -145,10 +148,13 @@ Create table.
 
 #### Parameters
 
-- `name` **[string][26]**
-- `schema` **[object][27]**
+- `name` **[string][25]**
+- `schema` **[object][26]** (optional, default `{}`)
+  - `schema.schema`
+  - `schema.idKey`
+  - `schema.access`
 
-Returns **[Table][30]**
+Returns **[Table][29]**
 
 ### destroy
 
@@ -166,21 +172,20 @@ Destroy database.
 [10]: #parameters-4
 [11]: #usertable
 [12]: #parameters-5
-[13]: #put-1
-[14]: #parameters-6
-[15]: #tada
-[16]: #parameters-7
-[17]: #on
-[18]: #parameters-8
-[19]: #close
-[20]: #tablesstream
-[21]: #gettable
-[22]: #parameters-9
-[23]: #createtable
-[24]: #parameters-10
-[25]: #destroy
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[28]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
-[29]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[30]: #table
+[13]: #parameters-6
+[14]: #tada
+[15]: #parameters-7
+[16]: #on
+[17]: #parameters-8
+[18]: #close
+[19]: #tablesstream
+[20]: #gettable
+[21]: #parameters-9
+[22]: #createtable
+[23]: #parameters-10
+[24]: #destroy
+[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[28]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[29]: #table
