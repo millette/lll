@@ -35,7 +35,7 @@ const getDb = (loc, options = {}) => {
     /**
      * Create table
      */
-    constructor({ db, ajv }, name, schema = {}, idKey = "_id") {
+    constructor({ db, ajv }, name, { schema, idKey = "_id", access }) {
       // Todo: check that idKey is required by schema
       assert(
         db instanceof levelup,
@@ -57,6 +57,8 @@ const getDb = (loc, options = {}) => {
           this.emit("put", this.unprefixed(key), value)
         } catch (e) {}
       })
+
+      if (!schema) schema = {}
 
       this.ajv = ajv
       this.schema = schema
@@ -99,9 +101,6 @@ const getDb = (loc, options = {}) => {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
-        // istanbul ignore next
-        // const idKey = typeof v === "string" ? v : "_id"
-        // const key = k[idKey]
         const key = k[this.idKey]
         // istanbul ignore next
         if (!key) {
@@ -110,6 +109,7 @@ const getDb = (loc, options = {}) => {
           err.idKey = this.idKey
           throw err
         }
+        user = v
         v = k
         k = key
       }
@@ -173,13 +173,16 @@ const getDb = (loc, options = {}) => {
     /**
      * Create user table
      */
-    constructor(parent) {
+    constructor(parent, access) {
       super(parent, "_user", {
-        required: ["_id"],
-        properties: {
-          _id: {
-            type: "string",
-            pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+        access,
+        schema: {
+          required: ["_id"],
+          properties: {
+            _id: {
+              type: "string",
+              pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+            },
           },
         },
       })
@@ -190,9 +193,11 @@ const getDb = (loc, options = {}) => {
      * @param {object} v user instance, _id must be the key
      * @returns {Promise}
      */
+    /*
     put(v) {
       super.put(v)
     }
+    */
   }
 
   /** Database class. */
@@ -223,7 +228,8 @@ const getDb = (loc, options = {}) => {
       this.db = db
       this.ajv = ajv
       this.tables = new Map()
-      this.schemas = new Table(this, "_table", schemaSchema)
+      this.schemas = new Table(this, "_table", { schema: schemaSchema })
+      // TODO: Add access
       this.users = new UserTable(this)
     }
 
@@ -275,7 +281,7 @@ const getDb = (loc, options = {}) => {
       if (table) return table
       return this.schemas
         .get(name)
-        .then((schema) => new Table(this, name, schema))
+        .then((schema) => new Table(this, name, { schema }))
     }
 
     /**
@@ -284,7 +290,7 @@ const getDb = (loc, options = {}) => {
      * @param {object} schema
      * @returns {Table}
      */
-    async createTable(name, schema, idKey) {
+    async createTable(name, { schema, idKey, access } = {}) {
       assert.equal(
         name && typeof name,
         "string",
@@ -313,7 +319,7 @@ const getDb = (loc, options = {}) => {
           throw e
         })
         .then(() => {
-          const table = new Table(this, name, schema, idKey)
+          const table = new Table(this, name, { access, schema, idKey })
           this.tables.set(name, table)
           return Promise.all([table, this.schemas.put(name, schema || false)])
         })
