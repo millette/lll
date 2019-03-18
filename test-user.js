@@ -10,7 +10,7 @@ import { beforeEach, afterEach } from "./helpers-test.js"
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
 
-test("create and destroy", async (t) => {
+test("create user and destroy db", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
   const users = db.getUsers()
   await users.put({ _id: "b-ob" })
