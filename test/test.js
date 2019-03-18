@@ -5,7 +5,7 @@ import test from "ava"
 import LevelErrors from "level-errors"
 
 // self
-import getDb from "."
+import getDb from ".."
 import { beforeEach, afterEach } from "./_helpers.js"
 
 test.beforeEach(beforeEach)
