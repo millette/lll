@@ -52,7 +52,7 @@ test("create table with schema (with idKey)", async (t) => {
     },
   }
 
-  const table = await db.createTable("bobo", schema, "smaller")
+  const table = await db.createTable("bobo", { schema, idKey: "smaller" })
   await table.put({ smaller: 4.99 })
   await db.destroy()
   t.pass()
@@ -70,7 +70,7 @@ test("create table with schema", async (t) => {
     },
   }
 
-  const table = await db.createTable("bobo", schema)
+  const table = await db.createTable("bobo", { schema })
   await table.put("thing", { joe: "blow" })
 
   try {
@@ -98,7 +98,7 @@ test("create table with bad schema", async (t) => {
     },
   }
 
-  t.throwsAsync(() => db.createTable("bobo", schema), {
+  t.throwsAsync(() => db.createTable("bobo", { schema }), {
     message:
       "schema is invalid: data.properties['smaller'].maximum should be number",
   })
@@ -127,7 +127,7 @@ test("table closing event", (t) => {
 
   t.plan(1)
   return getDb(t.context.loc, { errorIfExists: true })
-    .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
+    .then((db) => Promise.all([db, db.createTable("bobo", { schema })]))
     .then(([db, table]) => {
       table.on("closing", () => t.pass())
       return db.destroy()
@@ -146,7 +146,7 @@ test("table put event", (t) => {
 
   t.plan(1)
   return getDb(t.context.loc, { errorIfExists: true })
-    .then((db) => Promise.all([db, db.createTable("bobo", schema)]))
+    .then((db) => Promise.all([db, db.createTable("bobo", { schema })]))
     .then(([db, table]) => {
       table.on("put", (k, v) => t.is(k, "it"))
       return Promise.all([db, table.put("it", { want: "more" })])
