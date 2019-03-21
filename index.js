@@ -98,13 +98,11 @@ const getDb = (loc, options = {}) => {
     }
 
     /** Put item in table. */
-    put(k, v, user) {
+    async put(k, v, user) {
       // console.log('PUT-k', k)
       // console.log('PUT-v', v)
       // console.log('PUT-user', user)
       // console.log('PUT-access', this.access)
-      if (this.access && this.access.put === false)
-        throw new Error("Cannot put.")
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
@@ -121,6 +119,9 @@ const getDb = (loc, options = {}) => {
         k = key
       }
 
+      if (this.access && this.access.put && !this.access.put(user, k, v))
+        throw new Error("Cannot put.")
+
       if (!this.validate(v)) {
         localize(this.validate.errors)
         const err = new LevelErrors.WriteError(
@@ -136,7 +137,12 @@ const getDb = (loc, options = {}) => {
     get(k, user) {
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.ReadError()
-      return this.db.get(this.prefixed(k))
+
+      return this.db.get(this.prefixed(k)).then((v) => {
+        if (this.access && this.access.get && !this.access.get(user, k, v))
+          throw new Error("Cannot get.")
+        return v
+      })
     }
 
     _createReadStream(options) {
