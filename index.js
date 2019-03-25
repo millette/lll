@@ -16,6 +16,10 @@ const localize = require("ajv-i18n/localize/fr")
 const mkdir = require("make-dir")
 const schemaSchema = require("ajv/lib/refs/json-schema-secure.json")
 
+// self
+// const { hashPassword, checkPassword } = require('./password.js')
+
+// globals
 const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
 const POST_END = "\ufff0"
@@ -187,19 +191,33 @@ const getDb = (loc, options = {}) => {
      * Create user table
      */
     constructor(parent, access) {
-      super(parent, "_user", {
-        access,
-        schema: {
-          required: ["_id"],
-          properties: {
-            _id: {
-              type: "string",
-              pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
-            },
+      const schema = {
+        required: ["_id"],
+        properties: {
+          _id: {
+            type: "string",
+            pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
           },
         },
-      })
+      }
+      super(parent, "_user", { access, schema })
     }
+
+    createHash(user) {
+      // user.password
+    }
+
+    register(user) {}
+
+    verifyHash(user) {
+      // user.password
+    }
+
+    changePassword(user) {}
+
+    resetPassword(user) {}
+
+    put(user) {}
 
     /**
      * Create user.
