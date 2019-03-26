@@ -15,10 +15,17 @@ test("create user and destroy db", async (t) => {
   const badPassword = "elPassword666"
   const _id = "b-ob"
   const badId = "ji-m"
+  const email = "joe@example.com"
+  const badEmail = "joeexample.com"
 
   const db = await getDb(t.context.loc, { errorIfExists: true })
   const users = db.getUsers()
-  await users.register({ _id, password })
+
+  t.throwsAsync(() => users.register({ _id, password, email: badEmail }), {
+    instanceOf: LevelErrors.WriteError,
+  })
+
+  await users.register({ _id, password, email })
 
   await users.login({ _id, password })
 
@@ -41,6 +48,8 @@ test("create user and destroy db", async (t) => {
   t.throwsAsync(() => users.login({ _id: badId, password }), {
     instanceOf: LevelErrors.NotFoundError,
   })
+
+  await users.register({ _id: badId, password })
 
   await db.destroy()
   t.pass()

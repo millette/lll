@@ -186,11 +186,23 @@ const getDb = (loc, options = {}) => {
     // constructor(parent, access) {
     constructor(parent) {
       const schema = {
-        required: ["_id"],
+        required: ["_id", "salt", "derivedKey"], // , "email"
         properties: {
           _id: {
             type: "string",
             pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+          },
+          salt: {
+            type: "string",
+            pattern: "^[a-f0-9]{32}$",
+          },
+          derivedKey: {
+            type: "string",
+            pattern: "^[a-f0-9]{40}$",
+          },
+          email: {
+            type: "string",
+            format: "email",
           },
         },
       }
@@ -201,14 +213,14 @@ const getDb = (loc, options = {}) => {
       super(parent, "_user", { access, schema })
     }
 
-    async register({ _id, password }) {
+    async register({ _id, email, password }) {
       try {
         await super.get(_id, _id)
         throw new Error("User already exists.")
       } catch (e) {
         if (!(e instanceof LevelErrors.NotFoundError)) throw e
         const user = await hashPassword(password)
-        await super.put({ ...user, _id }, _id)
+        await super.put({ ...user, _id, email }, _id)
         return user
       }
     }
