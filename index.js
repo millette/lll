@@ -17,7 +17,7 @@ const mkdir = require("make-dir")
 const schemaSchema = require("ajv/lib/refs/json-schema-secure.json")
 
 // self
-// const { hashPassword, checkPassword } = require('./password.js')
+const { hashPassword, checkPassword } = require("./password.js")
 
 // globals
 const leveldownDestroy = promisify(leveldown.destroy)
@@ -67,8 +67,6 @@ const getDb = (loc, options = {}) => {
 
       this.ajv = ajv
       this.schema = schema
-      // console.log('NAME, SCHEMA', name, schema)
-      // this.validate = schema ? ajv.compile(schema) : () => true
       this.validate = ajv.compile(schema)
       this.tr = through.obj((chunk, enc, callback) => {
         // istanbul ignore next
@@ -103,10 +101,6 @@ const getDb = (loc, options = {}) => {
 
     /** Put item in table. */
     async put(k, v, user) {
-      // console.log('PUT-k', k)
-      // console.log('PUT-v', v)
-      // console.log('PUT-user', user)
-      // console.log('PUT-access', this.access)
       // istanbul ignore next
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
@@ -114,7 +108,6 @@ const getDb = (loc, options = {}) => {
         // istanbul ignore next
         if (!key) {
           const err = new Error("Missing _id field.")
-          // err.idKey = idKey
           err.idKey = this.idKey
           throw err
         }
@@ -203,32 +196,39 @@ const getDb = (loc, options = {}) => {
       super(parent, "_user", { access, schema })
     }
 
-    createHash(user) {
-      // user.password
+    async register({ _id, password }) {
+      try {
+        await this.get(_id)
+        // console.log('USER:', user)
+        throw new Error("User already exists.")
+      } catch (e) {
+        if (!(e instanceof LevelErrors.NotFoundError)) throw e
+        // console.log('EEE:', e)
+        const user = await hashPassword(password)
+        await super.put({ ...user, _id })
+        return user
+      }
     }
 
-    register(user) {}
-
-    verifyHash(user) {
-      // user.password
+    async login({ _id, password }) {
+      const user = await this.get(_id)
+      return checkPassword({ ...user, password })
     }
 
-    changePassword(user) {}
-
-    resetPassword(user) {}
-
-    put(user) {}
+    // createHash(password) { return hashPassword(password) }
+    // verifyHash(user) { return checkPassword(user) }
+    // changePassword(user) {}
+    // resetPassword(user) {}
 
     /**
      * Create user.
      * @param {object} v user instance, _id must be the key
      * @returns {Promise}
      */
-    /*
-    put(v) {
-      super.put(v)
+    put() {
+      // istanbul ignore next
+      throw new Error("User.put() is not implemented.")
     }
-    */
   }
 
   /** Database class. */
