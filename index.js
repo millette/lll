@@ -183,7 +183,8 @@ const getDb = (loc, options = {}) => {
     /**
      * Create user table
      */
-    constructor(parent, access) {
+    // constructor(parent, access) {
+    constructor(parent) {
       const schema = {
         required: ["_id"],
         properties: {
@@ -193,41 +194,39 @@ const getDb = (loc, options = {}) => {
           },
         },
       }
+      const access = {
+        put: (user, k) => user === k,
+        get: (user, k) => user === k,
+      }
       super(parent, "_user", { access, schema })
     }
 
     async register({ _id, password }) {
       try {
-        await this.get(_id)
-        // console.log('USER:', user)
+        await super.get(_id, _id)
         throw new Error("User already exists.")
       } catch (e) {
         if (!(e instanceof LevelErrors.NotFoundError)) throw e
-        // console.log('EEE:', e)
         const user = await hashPassword(password)
-        await super.put({ ...user, _id })
+        await super.put({ ...user, _id }, _id)
         return user
       }
     }
 
     async login({ _id, password }) {
-      const user = await this.get(_id)
+      const user = await super.get(_id, _id)
       return checkPassword({ ...user, password })
     }
 
-    // createHash(password) { return hashPassword(password) }
-    // verifyHash(user) { return checkPassword(user) }
     // changePassword(user) {}
     // resetPassword(user) {}
 
-    /**
-     * Create user.
-     * @param {object} v user instance, _id must be the key
-     * @returns {Promise}
-     */
+    get() {
+      return Promise.reject(new Error("UserTable.get() is not implemented."))
+    }
+
     put() {
-      // istanbul ignore next
-      throw new Error("User.put() is not implemented.")
+      return Promise.reject(new Error("UserTable.put() is not implemented."))
     }
   }
 
@@ -261,8 +260,9 @@ const getDb = (loc, options = {}) => {
       this.tables = new Map()
       this.schemas = new Table(this, "_table", { schema: schemaSchema })
       // TODO: Add access
-      const access = {}
-      this.users = new UserTable(this, access)
+      // const access = {}
+      // this.users = new UserTable(this, access)
+      this.users = new UserTable(this)
     }
 
     getUsers() {
@@ -394,5 +394,7 @@ const getDb = (loc, options = {}) => {
 
   return mkdir(loc).then(gogo)
 }
+
+getDb.LevelErrors = LevelErrors
 
 module.exports = getDb
