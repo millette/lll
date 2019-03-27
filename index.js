@@ -26,6 +26,12 @@ const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
 const prefixRe = /^[a-z]+$/
 
+const emailUnalias = (email) => {
+  const [name, domain] = email.split("@")
+  if (!domain) throw new LevelErrors.WriteError("Malformed email.")
+  return `${name.split("+")[0]}@${domain}`.toLowerCase()
+}
+
 /**
  * Initiate a database.
  * @param {string} loc database directory location
@@ -204,19 +210,21 @@ const getDb = (loc, options = {}) => {
       super(parent, "_email", { schema })
     }
 
+    async get(email) {
+      return super.get(emailUnalias(email))
+    }
+
     async put({ email, userId }) {
       assert(email)
       assert(userId)
-      const [name, domain] = email.split("@")
-      if (!domain) throw new LevelErrors.WriteError("Malformed email.")
-      const _id = `${name.split("+")[0]}@${domain}`.toLowerCase()
+
       try {
-        await super.get(_id)
+        await this.get(email)
         throw new LevelErrors.WriteError("Email already exists.")
       } catch (e) {
         if (!(e instanceof LevelErrors.NotFoundError)) throw e
         return super.put({
-          _id,
+          _id: emailUnalias(email),
           email,
           userId,
         })
@@ -277,7 +285,12 @@ const getDb = (loc, options = {}) => {
       }
     }
 
-    async login({ _id, password }) {
+    async login({ _id, password, email }) {
+      if (!email && _id.indexOf("@") !== -1) email = _id
+      if (email) {
+        const oy = await this.emails.get(email)
+        _id = oy.userId
+      }
       const user = await super.get(_id, _id)
       return checkPassword({ ...user, password })
     }
