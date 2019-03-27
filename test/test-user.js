@@ -85,3 +85,25 @@ test("unique emails", async (t) => {
   await db.destroy()
   t.pass()
 })
+
+test("create user (email required) and destroy db", async (t) => {
+  const password = "elPassword"
+  const _id = "b-ob"
+  const _id2 = "ji-m"
+  const email = "joe@example.com"
+
+  const db = await getDb(t.context.loc, {
+    emailRequired: true,
+    level: { errorIfExists: true },
+  })
+  const users = db.getUsers()
+
+  await t.throwsAsync(() => users.register({ _id, password }), {
+    instanceOf: LevelErrors.WriteError,
+  })
+
+  await users.register({ _id: _id2, password, email })
+
+  await db.destroy()
+  t.pass()
+})
