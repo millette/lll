@@ -230,7 +230,7 @@ const getDb = (loc, options = {}) => {
      * Create user table
      */
     // constructor(parent, access) {
-    constructor(parent) {
+    constructor(parent, emailRequired) {
       const schema = {
         required: ["_id", "salt", "derivedKey"], // , "email"
         properties: {
@@ -252,6 +252,7 @@ const getDb = (loc, options = {}) => {
           },
         },
       }
+      if (emailRequired) schema.required.push("email")
       const access = {
         put: (user, k) => user === k,
         get: (user, k) => user === k,
@@ -301,7 +302,7 @@ const getDb = (loc, options = {}) => {
      * @param {function} reject
      * @param {object} ajv
      */
-    constructor(db, reject, ajv) {
+    constructor(db, reject, ajv, emailRequired) {
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
@@ -322,7 +323,7 @@ const getDb = (loc, options = {}) => {
       this.ajv = ajv
       this.tables = new Map()
       this.schemas = new Table(this, "_table", { schema: schemaSchema })
-      this.users = new UserTable(this)
+      this.users = new UserTable(this, emailRequired)
     }
 
     getUsers() {
@@ -426,7 +427,7 @@ const getDb = (loc, options = {}) => {
     new Promise((resolve, reject) => {
       const db = leveldown(loc)
       let levelOptions
-      const { level, ajv, ...rest } = options
+      const { level, ajv, emailRequired, ...rest } = options
       // istanbul ignore next
       if (!level && !ajv) levelOptions = rest
       // istanbul ignore next
@@ -441,7 +442,9 @@ const getDb = (loc, options = {}) => {
         if (e) return reject(e)
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
-          const ok = () => resolve(new Tada(db2, reject, new Ajv(ajvOptions)))
+          const ok = () =>
+            resolve(new Tada(db2, reject, new Ajv(ajvOptions), emailRequired))
+
           db2.once("ready", ok)
           // istanbul ignore next
           db2.once("error", (err) => {
