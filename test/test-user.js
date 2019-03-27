@@ -61,7 +61,8 @@ test("unique emails", async (t) => {
   const password = "elPassword"
   const _id = "b-ob"
   const id2 = "ji-m"
-  const email = "joe@example.com"
+  const email = "joe+1@example.com"
+  const email2 = "joe+2@example.com"
 
   const db = await getDb(t.context.loc, { errorIfExists: true })
   const users = db.getUsers()
@@ -72,6 +73,14 @@ test("unique emails", async (t) => {
     instanceOf: LevelErrors.WriteError,
     message: "Email already exists.",
   })
+
+  await t.throwsAsync(
+    () => users.register({ _id: id2, password, email: email2 }),
+    {
+      instanceOf: LevelErrors.WriteError,
+      message: "Email already exists.",
+    }
+  )
 
   await db.destroy()
   t.pass()
