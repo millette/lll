@@ -23,6 +23,7 @@ test("create user and destroy db", async (t) => {
 
   t.throwsAsync(() => users.register({ _id, password, email: badEmail }), {
     instanceOf: LevelErrors.WriteError,
+    message: "Malformed email.",
   })
 
   await users.register({ _id, password, email })
@@ -30,6 +31,7 @@ test("create user and destroy db", async (t) => {
   await users.login({ _id, password })
 
   t.throwsAsync(() => users.register({ _id, password }), {
+    instanceOf: LevelErrors.WriteError,
     message: "User already exists.",
   })
 
@@ -50,6 +52,26 @@ test("create user and destroy db", async (t) => {
   })
 
   await users.register({ _id: badId, password })
+
+  await db.destroy()
+  t.pass()
+})
+
+test("unique emails", async (t) => {
+  const password = "elPassword"
+  const _id = "b-ob"
+  const id2 = "ji-m"
+  const email = "joe@example.com"
+
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const users = db.getUsers()
+
+  await users.register({ _id, password, email })
+
+  await t.throwsAsync(() => users.register({ _id: id2, password, email }), {
+    instanceOf: LevelErrors.WriteError,
+    message: "Email already exists.",
+  })
 
   await db.destroy()
   t.pass()
