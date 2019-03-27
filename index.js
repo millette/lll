@@ -133,7 +133,7 @@ const getDb = (loc, options = {}) => {
     /** Get item from table. */
     get(k, user) {
       // istanbul ignore next
-      if (this.db.isClosed()) throw new LevelErrors.ReadError()
+      if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
 
       return this.db.get(this.prefixed(k)).then((v) => {
         if (this.access && this.access.get && !this.access.get(user, k, v))
@@ -144,7 +144,7 @@ const getDb = (loc, options = {}) => {
 
     _createReadStream(options) {
       // istanbul ignore next
-      if (this.db.isClosed()) throw new LevelErrors.ReadError()
+      if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
       itKeys.forEach((k) => {
         // istanbul ignore next
         if (options[k]) options[k] = this.prefixed(options[k])
@@ -176,6 +176,52 @@ const getDb = (loc, options = {}) => {
       return this._createReadStream({ ...options, keys: false, values: true })
     }
     */
+  }
+
+  /** Class representing the user table. */
+  class EmailTable extends Table {
+    /**
+     * Create email table
+     */
+    constructor(parent) {
+      const schema = {
+        required: ["_id", "userId", "email"],
+        properties: {
+          _id: {
+            type: "string",
+            format: "email",
+          },
+          userId: {
+            type: "string",
+            pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+          },
+          email: {
+            type: "string",
+            format: "email",
+          },
+        },
+      }
+      super(parent, "_email", { schema })
+    }
+
+    async put({ email, userId }) {
+      assert(email)
+      assert(userId)
+      const [name, domain] = email.split("@")
+      if (!domain) throw new LevelErrors.WriteError("Malformed email.")
+      const _id = `${name.split("+")[0]}@${domain}`.toLowerCase()
+      try {
+        await super.get(_id)
+        throw new LevelErrors.WriteError("Email already exists.")
+      } catch (e) {
+        if (!(e instanceof LevelErrors.NotFoundError)) throw e
+        return super.put({
+          _id,
+          email,
+          userId,
+        })
+      }
+    }
   }
 
   /** Class representing the user table. */
@@ -211,14 +257,19 @@ const getDb = (loc, options = {}) => {
         get: (user, k) => user === k,
       }
       super(parent, "_user", { access, schema })
+      this.emails = new EmailTable(parent)
     }
 
     async register({ _id, email, password }) {
       try {
         await super.get(_id, _id)
-        throw new Error("User already exists.")
+        throw new LevelErrors.WriteError("User already exists.")
       } catch (e) {
         if (!(e instanceof LevelErrors.NotFoundError)) throw e
+        if (email) {
+          await this.emails.put({ email, userId: _id })
+        }
+
         const user = await hashPassword(password)
         await super.put({ ...user, _id, email }, _id)
         return user
@@ -271,9 +322,6 @@ const getDb = (loc, options = {}) => {
       this.ajv = ajv
       this.tables = new Map()
       this.schemas = new Table(this, "_table", { schema: schemaSchema })
-      // TODO: Add access
-      // const access = {}
-      // this.users = new UserTable(this, access)
       this.users = new UserTable(this)
     }
 
