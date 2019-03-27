@@ -83,7 +83,7 @@ const getDb = (loc, options = {}) => {
       this.schema = schema
       this.validate = ajv.compile(schema)
       this.tr = through.obj((chunk, enc, callback) => {
-        // istanbul ignore next
+        // istanbul ignore if
         if (typeof chunk === "string")
           return callback(null, this.unprefixed(chunk))
         // istanbul ignore next
@@ -101,7 +101,7 @@ const getDb = (loc, options = {}) => {
     */
 
     prefixed(k = "") {
-      // istanbul ignore next
+      // istanbul ignore if
       if (this.db.isClosed()) throw new LevelErrors.OpenError()
       return `${this.name}:${k}`
     }
@@ -115,11 +115,11 @@ const getDb = (loc, options = {}) => {
 
     /** Put item in table. */
     async put(k, v, user) {
-      // istanbul ignore next
+      // istanbul ignore if
       if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
         const key = k[this.idKey]
-        // istanbul ignore next
+        // istanbul ignore if
         if (!key) {
           const err = new Error("Missing _id field.")
           err.idKey = this.idKey
@@ -146,7 +146,7 @@ const getDb = (loc, options = {}) => {
 
     /** Get item from table. */
     get(k, user) {
-      // istanbul ignore next
+      // istanbul ignore if
       if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
 
       return this.db.get(this.prefixed(k)).then((v) => {
@@ -157,10 +157,10 @@ const getDb = (loc, options = {}) => {
     }
 
     _createReadStream(options) {
-      // istanbul ignore next
+      // istanbul ignore if
       if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
       itKeys.forEach((k) => {
-        // istanbul ignore next
+        // istanbul ignore if
         if (options[k]) options[k] = this.prefixed(options[k])
       })
       // istanbul ignore next
@@ -427,7 +427,7 @@ const getDb = (loc, options = {}) => {
           "schema argument must be an object."
         )
 
-      // istanbul ignore next
+      // istanbul ignore if
       if (!prefixRe.test(name))
         throw new Error("name argument must match ^[a-z]+$")
 
@@ -461,9 +461,7 @@ const getDb = (loc, options = {}) => {
       const db = leveldown(loc)
       let levelOptions
       const { level, ajv, emailRequired, ...rest } = options
-      // istanbul ignore next
       if (!level && !ajv) levelOptions = rest
-      // istanbul ignore next
       if (level) levelOptions = level
       const ajvOptions = {
         ...defaultAjv,
@@ -471,7 +469,7 @@ const getDb = (loc, options = {}) => {
       }
 
       db.open(levelOptions, (e) => {
-        // istanbul ignore next
+        // istanbul ignore if
         if (e) return reject(e)
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
