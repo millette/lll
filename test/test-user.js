@@ -86,7 +86,7 @@ test("unique emails", async (t) => {
   t.pass()
 })
 
-test("create user (email required) and destroy db", async (t) => {
+test("create user (email required)", async (t) => {
   const password = "elPassword"
   const _id = "b-ob"
   const _id2 = "ji-m"
@@ -103,6 +103,47 @@ test("create user (email required) and destroy db", async (t) => {
   })
 
   await users.register({ _id: _id2, password, email })
+
+  await db.destroy()
+  t.pass()
+})
+
+test("email login", async (t) => {
+  const password = "elPassword"
+  const _id = "b-ob"
+  const email = "joe@example.com"
+  const badEmail = "bob@example.com"
+
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const users = db.getUsers()
+
+  await users.register({ _id, password, email })
+
+  await users.login({ email, password })
+  await users.login({ _id: email, password })
+
+  await t.throwsAsync(() => users.login({ email: badEmail, password }), {
+    instanceOf: LevelErrors.NotFoundError,
+  })
+
+  await db.destroy()
+  t.pass()
+})
+
+test("email alias login", async (t) => {
+  const password = "elPassword"
+  const _id = "b-ob"
+  const email = "joe+666@example.com"
+  const email2 = "JOE+777@example.com"
+  const email3 = "joe@example.com"
+
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const users = db.getUsers()
+
+  await users.register({ _id, password, email })
+  await users.login({ email, password })
+  await users.login({ email: email2, password })
+  await users.login({ email: email3, password })
 
   await db.destroy()
   t.pass()
