@@ -2,35 +2,45 @@
 
 ### Table of Contents
 
-- [getDb][1]
-  - [Parameters][2]
-- [Table][3]
-  - [Parameters][4]
-  - [put][5]
-    - [Parameters][6]
-  - [get][7]
-    - [Parameters][8]
-  - [createReadStream][9]
-    - [Parameters][10]
-- [EmailTable][11]
-  - [Parameters][12]
-- [UserTable][13]
-  - [Parameters][14]
-- [Tada][15]
-  - [Parameters][16]
-  - [on][17]
-    - [Parameters][18]
-  - [close][19]
-  - [tablesStream][20]
-  - [getTable][21]
-    - [Parameters][22]
-  - [createTable][23]
-    - [Parameters][24]
-  - [destroy][25]
-- [checkPassword][26]
-  - [Parameters][27]
-- [hashPassword][28]
-  - [Parameters][29]
+- [lll][1]
+- [getDb][2]
+  - [Parameters][3]
+- [Table][4]
+  - [Parameters][5]
+  - [put][6]
+    - [Parameters][7]
+  - [get][8]
+    - [Parameters][9]
+  - [createReadStream][10]
+    - [Parameters][11]
+- [EmailTable][12]
+  - [Parameters][13]
+- [UserTable][14]
+  - [Parameters][15]
+  - [register][16]
+    - [Parameters][17]
+  - [login][18]
+    - [Parameters][19]
+- [DB][20]
+  - [Parameters][21]
+  - [on][22]
+    - [Parameters][23]
+  - [close][24]
+  - [tablesStream][25]
+  - [getTable][26]
+    - [Parameters][27]
+  - [createTable][28]
+    - [Parameters][29]
+  - [destroy][30]
+- [lll/password][31]
+- [checkPassword][32]
+  - [Parameters][33]
+- [hashPassword][34]
+  - [Parameters][35]
+
+## lll
+
+lll module.
 
 ## getDb
 
@@ -38,10 +48,13 @@ Initiate a database.
 
 ### Parameters
 
-- `loc` **[string][30]** database directory location
-- `options` **[object][31]** level and ajv options (optional, default `{}`)
+- `loc` **[string][36]** database directory location
+- `options` **[object][37]** (optional, default `{}`)
+  - `options.level` **[object][37]**
+  - `options.ajv` **[object][37]**
+  - `options.emailRequired` **[boolean][38]**
 
-Returns **[object][31]** db instance
+Returns **[object][37]** db instance
 
 ## Table
 
@@ -51,11 +64,11 @@ Class representing a table.
 
 ### Parameters
 
-- `$0` **[Object][31]**
+- `$0` **[Object][37]**
   - `$0.db`
   - `$0.ajv`
 - `name`
-- `$2` **[Object][31]**
+- `$2` **[Object][37]**
   - `$2.schema`
   - `$2.idKey` (optional, default `"_id"`)
   - `$2.access`
@@ -91,7 +104,7 @@ Create readable stream.
 
 **Extends Table**
 
-Class representing the user table.
+Class representing the email table.
 
 ### Parameters
 
@@ -108,7 +121,29 @@ Class representing the user table.
 - `parent`
 - `emailRequired`
 
-## Tada
+### register
+
+Create (register) new user.
+
+#### Parameters
+
+- `$0` **[Object][37]**
+  - `$0._id`
+  - `$0.email`
+  - `$0.password`
+
+### login
+
+Login (verify user password).
+
+#### Parameters
+
+- `$0` **[Object][37]**
+  - `$0._id`
+  - `$0.password`
+  - `$0.email`
+
+## DB
 
 **Extends EventEmitter**
 
@@ -116,9 +151,9 @@ Database class.
 
 ### Parameters
 
-- `db` **[object][31]**
-- `reject` **[function][32]**
-- `ajv` **[object][31]**
+- `db` **[object][37]**
+- `reject` **[function][39]**
+- `ajv` **[object][37]**
 - `emailRequired`
 
 ### on
@@ -146,9 +181,9 @@ Return table by name.
 
 #### Parameters
 
-- `name` **[string][30]**
+- `name` **[string][36]**
 
-Returns **[Table][33]**
+Returns **[Table][40]**
 
 ### createTable
 
@@ -156,17 +191,21 @@ Create table.
 
 #### Parameters
 
-- `name` **[string][30]**
-- `schema` **[object][31]** (optional, default `{}`)
-  - `schema.schema`
-  - `schema.idKey`
-  - `schema.access`
+- `name` **[string][36]**
+- `options` **[object][37]** (optional, default `{}`)
+  - `options.schema` **[object][37]**
+  - `options.idKey` **[string][36]**
+  - `options.access` **[object][37]**
 
-Returns **[Table][33]**
+Returns **[Table][40]**
 
 ### destroy
 
 Destroy database.
+
+## lll/password
+
+Password module.
 
 ## checkPassword
 
@@ -174,12 +213,12 @@ Verify a password hash.
 
 ### Parameters
 
-- `obj` **[object][31]**
-  - `obj.password` **[string][30]**
-  - `obj.salt` **[string][30]**
-  - `obj.derivedKey` **[string][30]**
+- `obj` **[object][37]**
+  - `obj.password` **[string][36]**
+  - `obj.salt` **[string][36]**
+  - `obj.derivedKey` **[string][36]**
 
-Returns **[promise][34]** Rejects on failure
+Returns **[promise][41]** Rejects on failure
 
 ## hashPassword
 
@@ -187,41 +226,48 @@ Hash a password.
 
 ### Parameters
 
-- `password` **[string][30]**
+- `password` **[string][36]**
 
-Returns **[promise][34]** Object with salt and derivedKey fields
+Returns **[promise][41]** Object with salt and derivedKey fields
 
-[1]: #getdb
-[2]: #parameters
-[3]: #table
-[4]: #parameters-1
-[5]: #put
-[6]: #parameters-2
-[7]: #get
-[8]: #parameters-3
-[9]: #createreadstream
-[10]: #parameters-4
-[11]: #emailtable
-[12]: #parameters-5
-[13]: #usertable
-[14]: #parameters-6
-[15]: #tada
-[16]: #parameters-7
-[17]: #on
-[18]: #parameters-8
-[19]: #close
-[20]: #tablesstream
-[21]: #gettable
-[22]: #parameters-9
-[23]: #createtable
-[24]: #parameters-10
-[25]: #destroy
-[26]: #checkpassword
+[1]: #lll
+[2]: #getdb
+[3]: #parameters
+[4]: #table
+[5]: #parameters-1
+[6]: #put
+[7]: #parameters-2
+[8]: #get
+[9]: #parameters-3
+[10]: #createreadstream
+[11]: #parameters-4
+[12]: #emailtable
+[13]: #parameters-5
+[14]: #usertable
+[15]: #parameters-6
+[16]: #register
+[17]: #parameters-7
+[18]: #login
+[19]: #parameters-8
+[20]: #db
+[21]: #parameters-9
+[22]: #on
+[23]: #parameters-10
+[24]: #close
+[25]: #tablesstream
+[26]: #gettable
 [27]: #parameters-11
-[28]: #hashpassword
+[28]: #createtable
 [29]: #parameters-12
-[30]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[31]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[32]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[33]: #table
-[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[30]: #destroy
+[31]: #lllpassword
+[32]: #checkpassword
+[33]: #parameters-13
+[34]: #hashpassword
+[35]: #parameters-14
+[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[38]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[40]: #table
+[41]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise

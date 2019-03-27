@@ -1,3 +1,8 @@
+/**
+ * lll module.
+ * @module lll
+ */
+
 "use strict"
 
 // core
@@ -35,7 +40,10 @@ const emailUnalias = (email) => {
 /**
  * Initiate a database.
  * @param {string} loc database directory location
- * @param {object} options level and ajv options
+ * @param {object} options
+ * @param {object} options.level
+ * @param {object} options.ajv
+ * @param {boolean} options.emailRequired
  * @returns {object} db instance
  */
 const getDb = (loc, options = {}) => {
@@ -184,7 +192,7 @@ const getDb = (loc, options = {}) => {
     */
   }
 
-  /** Class representing the user table. */
+  /** Class representing the email table. */
   class EmailTable extends Table {
     /**
      * Create email table
@@ -237,10 +245,9 @@ const getDb = (loc, options = {}) => {
     /**
      * Create user table
      */
-    // constructor(parent, access) {
     constructor(parent, emailRequired) {
       const schema = {
-        required: ["_id", "salt", "derivedKey"], // , "email"
+        required: ["_id", "salt", "derivedKey"],
         properties: {
           _id: {
             type: "string",
@@ -269,6 +276,9 @@ const getDb = (loc, options = {}) => {
       this.emails = new EmailTable(parent)
     }
 
+    /**
+     * Create (register) new user.
+     */
     async register({ _id, email, password }) {
       const origId = _id
       _id = _id.toLowerCase()
@@ -287,6 +297,9 @@ const getDb = (loc, options = {}) => {
       }
     }
 
+    /**
+     * Login (verify user password).
+     */
     async login({ _id, password, email }) {
       if (!email && _id.indexOf("@") !== -1) email = _id
       if (email) {
@@ -312,7 +325,7 @@ const getDb = (loc, options = {}) => {
   }
 
   /** Database class. */
-  class Tada extends EventEmitter {
+  class DB extends EventEmitter {
     /**
      * Create a Database instance.
      * @param {object} db
@@ -395,7 +408,10 @@ const getDb = (loc, options = {}) => {
     /**
      * Create table.
      * @param {string} name
-     * @param {object} schema
+     * @param {object} options
+     * @param {object} options.schema
+     * @param {object} options.access
+     * @param {string} options.idKey
      * @returns {Table}
      */
     async createTable(name, { schema, idKey, access } = {}) {
@@ -440,7 +456,7 @@ const getDb = (loc, options = {}) => {
     }
   }
 
-  const gogo = () =>
+  const open = () =>
     new Promise((resolve, reject) => {
       const db = leveldown(loc)
       let levelOptions
@@ -460,7 +476,7 @@ const getDb = (loc, options = {}) => {
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
           const ok = () =>
-            resolve(new Tada(db2, reject, new Ajv(ajvOptions), emailRequired))
+            resolve(new DB(db2, reject, new Ajv(ajvOptions), emailRequired))
 
           db2.once("ready", ok)
           // istanbul ignore next
@@ -472,7 +488,7 @@ const getDb = (loc, options = {}) => {
       })
     })
 
-  return mkdir(loc).then(gogo)
+  return mkdir(loc).then(open)
 }
 
 getDb.LevelErrors = LevelErrors
