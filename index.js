@@ -270,6 +270,8 @@ const getDb = (loc, options = {}) => {
     }
 
     async register({ _id, email, password }) {
+      const origId = _id
+      _id = _id.toLowerCase()
       try {
         await super.get(_id, _id)
         throw new LevelErrors.WriteError("User already exists.")
@@ -280,7 +282,7 @@ const getDb = (loc, options = {}) => {
         }
 
         const user = await hashPassword(password)
-        await super.put({ ...user, _id, email }, _id)
+        await super.put({ ...user, _id, email, origId }, _id)
         return user
       }
     }
@@ -290,6 +292,8 @@ const getDb = (loc, options = {}) => {
       if (email) {
         const oy = await this.emails.get(email)
         _id = oy.userId
+      } else {
+        _id = _id.toLowerCase()
       }
       const user = await super.get(_id, _id)
       return checkPassword({ ...user, password })
