@@ -130,6 +130,25 @@ test("email login", async (t) => {
   t.pass()
 })
 
+test("email login uppper/lowercase", async (t) => {
+  const password = "elPassword"
+  const _id = "b-ob"
+  const _idMixed = "B-ob"
+  const _id2 = "ji-m"
+  const _id2Mixed = "jI-m"
+
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const users = db.getUsers()
+
+  await users.register({ _id: _idMixed, password })
+  await users.login({ _id, password })
+  await users.register({ _id: _id2Mixed, password })
+  await users.login({ _id: _id2, password })
+
+  await db.destroy()
+  t.pass()
+})
+
 test("email alias login", async (t) => {
   const password = "elPassword"
   const _id = "b-ob"
