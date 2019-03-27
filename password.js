@@ -1,3 +1,8 @@
+/**
+ * Password module.
+ * @module lll/password
+ */
+
 "use strict"
 
 // core
@@ -7,6 +12,14 @@ const ITERATIONS = 10
 const KEYLEN = 20
 const SALTLEN = 16
 
+/**
+ * Verify a password hash.
+ * @param {object} obj
+ * @param {string} obj.password
+ * @param {string} obj.salt
+ * @param {string} obj.derivedKey
+ * @returns {promise} Rejects on failure
+ */
 const checkPassword = ({ password, salt, derivedKey }) =>
   new Promise((resolve, reject) => {
     const hashImp = (saltArg) =>
@@ -40,6 +53,11 @@ const checkPassword = ({ password, salt, derivedKey }) =>
     })
   })
 
+/**
+ * Hash a password.
+ * @param {string} password
+ * @returns {promise} Object with salt and derivedKey fields
+ */
 const hashPassword = (password) => checkPassword({ password })
 
 module.exports = { hashPassword, checkPassword }

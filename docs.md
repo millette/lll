@@ -12,20 +12,25 @@
     - [Parameters][8]
   - [createReadStream][9]
     - [Parameters][10]
-- [UserTable][11]
+- [EmailTable][11]
   - [Parameters][12]
-  - [Parameters][13]
-- [Tada][14]
-  - [Parameters][15]
-  - [on][16]
-    - [Parameters][17]
-  - [close][18]
-  - [tablesStream][19]
-  - [getTable][20]
-    - [Parameters][21]
-  - [createTable][22]
-    - [Parameters][23]
-  - [destroy][24]
+- [UserTable][13]
+  - [Parameters][14]
+- [Tada][15]
+  - [Parameters][16]
+  - [on][17]
+    - [Parameters][18]
+  - [close][19]
+  - [tablesStream][20]
+  - [getTable][21]
+    - [Parameters][22]
+  - [createTable][23]
+    - [Parameters][24]
+  - [destroy][25]
+- [checkPassword][26]
+  - [Parameters][27]
+- [hashPassword][28]
+  - [Parameters][29]
 
 ## getDb
 
@@ -33,10 +38,10 @@ Initiate a database.
 
 ### Parameters
 
-- `loc` **[string][25]** database directory location
-- `options` **[object][26]** level and ajv options (optional, default `{}`)
+- `loc` **[string][30]** database directory location
+- `options` **[object][31]** level and ajv options (optional, default `{}`)
 
-Returns **[object][26]** db instance
+Returns **[object][31]** db instance
 
 ## Table
 
@@ -46,11 +51,11 @@ Class representing a table.
 
 ### Parameters
 
-- `$0` **[Object][26]**
+- `$0` **[Object][31]**
   - `$0.db`
   - `$0.ajv`
 - `name`
-- `$2` **[Object][26]**
+- `$2` **[Object][31]**
   - `$2.schema`
   - `$2.idKey` (optional, default `"_id"`)
   - `$2.access`
@@ -63,6 +68,7 @@ Put item in table.
 
 - `k`
 - `v`
+- `user`
 
 ### get
 
@@ -71,6 +77,7 @@ Get item from table.
 #### Parameters
 
 - `k`
+- `user`
 
 ### createReadStream
 
@@ -79,6 +86,16 @@ Create readable stream.
 #### Parameters
 
 - `options` (optional, default `{}`)
+
+## EmailTable
+
+**Extends Table**
+
+Class representing the user table.
+
+### Parameters
+
+- `parent`
 
 ## UserTable
 
@@ -89,17 +106,7 @@ Class representing the user table.
 ### Parameters
 
 - `parent`
-- `access`
-
-##
-
-Create user.
-
-### Parameters
-
-- `v` **[object][26]** user instance, \_id must be the key
-
-Returns **[Promise][27]**
+- `emailRequired`
 
 ## Tada
 
@@ -109,9 +116,10 @@ Database class.
 
 ### Parameters
 
-- `db` **[object][26]**
-- `reject` **[function][28]**
-- `ajv` **[object][26]**
+- `db` **[object][31]**
+- `reject` **[function][32]**
+- `ajv` **[object][31]**
+- `emailRequired`
 
 ### on
 
@@ -138,9 +146,9 @@ Return table by name.
 
 #### Parameters
 
-- `name` **[string][25]**
+- `name` **[string][30]**
 
-Returns **[Table][29]**
+Returns **[Table][33]**
 
 ### createTable
 
@@ -148,17 +156,40 @@ Create table.
 
 #### Parameters
 
-- `name` **[string][25]**
-- `schema` **[object][26]** (optional, default `{}`)
+- `name` **[string][30]**
+- `schema` **[object][31]** (optional, default `{}`)
   - `schema.schema`
   - `schema.idKey`
   - `schema.access`
 
-Returns **[Table][29]**
+Returns **[Table][33]**
 
 ### destroy
 
 Destroy database.
+
+## checkPassword
+
+Verify a password hash.
+
+### Parameters
+
+- `obj` **[object][31]**
+  - `obj.password` **[string][30]**
+  - `obj.salt` **[string][30]**
+  - `obj.derivedKey` **[string][30]**
+
+Returns **[promise][34]** Rejects on failure
+
+## hashPassword
+
+Hash a password.
+
+### Parameters
+
+- `password` **[string][30]**
+
+Returns **[promise][34]** Object with salt and derivedKey fields
 
 [1]: #getdb
 [2]: #parameters
@@ -170,22 +201,27 @@ Destroy database.
 [8]: #parameters-3
 [9]: #createreadstream
 [10]: #parameters-4
-[11]: #usertable
+[11]: #emailtable
 [12]: #parameters-5
-[13]: #parameters-6
-[14]: #tada
-[15]: #parameters-7
-[16]: #on
-[17]: #parameters-8
-[18]: #close
-[19]: #tablesstream
-[20]: #gettable
-[21]: #parameters-9
-[22]: #createtable
-[23]: #parameters-10
-[24]: #destroy
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
-[28]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[29]: #table
+[13]: #usertable
+[14]: #parameters-6
+[15]: #tada
+[16]: #parameters-7
+[17]: #on
+[18]: #parameters-8
+[19]: #close
+[20]: #tablesstream
+[21]: #gettable
+[22]: #parameters-9
+[23]: #createtable
+[24]: #parameters-10
+[25]: #destroy
+[26]: #checkpassword
+[27]: #parameters-11
+[28]: #hashpassword
+[29]: #parameters-12
+[30]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[31]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[32]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[33]: #table
+[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
