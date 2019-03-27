@@ -51,12 +51,9 @@ const getDb = (loc, options = {}) => {
   /** Class representing a table. */
   class Table extends EventEmitter {
     /**
-     * Create table
-     * @param {object} internal
      * @param {object} internal.db
      * @param {object} internal.ajv
      * @param {string} name
-     * @param {object} options
      * @param {object} options.schema
      * @param {string} options.idKey
      * @param {object} options.access
@@ -202,9 +199,6 @@ const getDb = (loc, options = {}) => {
 
   /** Class representing the email table. */
   class EmailTable extends Table {
-    /**
-     * Create email table
-     */
     constructor(parent) {
       const schema = {
         required: ["_id", "userId", "email"],
@@ -250,9 +244,6 @@ const getDb = (loc, options = {}) => {
 
   /** Class representing the user table. */
   class UserTable extends Table {
-    /**
-     * Create user table
-     */
     constructor(parent, emailRequired) {
       const schema = {
         required: ["_id", "salt", "derivedKey"],
@@ -345,7 +336,6 @@ const getDb = (loc, options = {}) => {
   /** Database class. */
   class DB extends EventEmitter {
     /**
-     * Create a Database instance.
      * @param {object} db
      * @param {function} reject
      * @param {object} ajv

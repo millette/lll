@@ -72,8 +72,6 @@ Class representing a table.
   - `$2.schema`
   - `$2.idKey` (optional, default `"_id"`)
   - `$2.access`
-- `internal` **[object][37]**
-- `options` **[object][37]**
 
 ### put
 
