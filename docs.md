@@ -67,11 +67,13 @@ Class representing a table.
 - `$0` **[Object][37]**
   - `$0.db`
   - `$0.ajv`
-- `name`
+- `name` **[string][36]**
 - `$2` **[Object][37]**
   - `$2.schema`
   - `$2.idKey` (optional, default `"_id"`)
   - `$2.access`
+- `internal` **[object][37]**
+- `options` **[object][37]**
 
 ### put
 
@@ -127,10 +129,12 @@ Create (register) new user.
 
 #### Parameters
 
-- `$0` **[Object][37]**
-  - `$0._id`
-  - `$0.email`
-  - `$0.password`
+- `options` **[object][37]**
+  - `options._id` **[string][36]**
+  - `options.email` **[string][36]**
+  - `options.password` **[string][36]**
+
+Returns **[promise][39]** user object
 
 ### login
 
@@ -152,7 +156,7 @@ Database class.
 ### Parameters
 
 - `db` **[object][37]**
-- `reject` **[function][39]**
+- `reject` **[function][40]**
 - `ajv` **[object][37]**
 - `emailRequired`
 
@@ -183,7 +187,7 @@ Return table by name.
 
 - `name` **[string][36]**
 
-Returns **[Table][40]**
+Returns **[Table][41]**
 
 ### createTable
 
@@ -197,7 +201,7 @@ Create table.
   - `options.idKey` **[string][36]**
   - `options.access` **[object][37]**
 
-Returns **[Table][40]**
+Returns **[Table][41]**
 
 ### destroy
 
@@ -218,7 +222,7 @@ Verify a password hash.
   - `obj.salt` **[string][36]**
   - `obj.derivedKey` **[string][36]**
 
-Returns **[promise][41]** Rejects on failure
+Returns **[promise][39]** Rejects on failure
 
 ## hashPassword
 
@@ -228,7 +232,7 @@ Hash a password.
 
 - `password` **[string][36]**
 
-Returns **[promise][41]** Object with salt and derivedKey fields
+Returns **[promise][39]** Object with salt and derivedKey fields
 
 [1]: #lll
 [2]: #getdb
@@ -268,6 +272,6 @@ Returns **[promise][41]** Object with salt and derivedKey fields
 [36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 [37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 [38]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
-[39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[40]: #table
-[41]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[41]: #table

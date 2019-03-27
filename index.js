@@ -52,6 +52,14 @@ const getDb = (loc, options = {}) => {
   class Table extends EventEmitter {
     /**
      * Create table
+     * @param {object} internal
+     * @param {object} internal.db
+     * @param {object} internal.ajv
+     * @param {string} name
+     * @param {object} options
+     * @param {object} options.schema
+     * @param {string} options.idKey
+     * @param {object} options.access
      */
     constructor({ db, ajv }, name, { schema, idKey = "_id", access }) {
       // Todo: check that idKey is required by schema
@@ -278,6 +286,11 @@ const getDb = (loc, options = {}) => {
 
     /**
      * Create (register) new user.
+     * @param {object} options
+     * @param {string} options._id
+     * @param {string} options.email
+     * @param {string} options.password
+     * @returns {promise} user object
      */
     async register({ _id, email, password }) {
       const origId = _id
