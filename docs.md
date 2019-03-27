@@ -131,8 +131,8 @@ Create (register) new user.
 
 - `options` **[object][37]**
   - `options._id` **[string][36]**
-  - `options.email` **[string][36]**
   - `options.password` **[string][36]**
+  - `options.email` **[string][36]**
 
 Returns **[promise][39]** user object
 
@@ -142,10 +142,12 @@ Login (verify user password).
 
 #### Parameters
 
-- `$0` **[Object][37]**
-  - `$0._id`
-  - `$0.password`
-  - `$0.email`
+- `options` **[object][37]**
+  - `options._id` **[string][36]**
+  - `options.password` **[string][36]**
+  - `options.email` **[string][36]**
+
+Returns **[promise][39]** Rejects if bad user or password
 
 ## DB
 

@@ -288,11 +288,11 @@ const getDb = (loc, options = {}) => {
      * Create (register) new user.
      * @param {object} options
      * @param {string} options._id
-     * @param {string} options.email
      * @param {string} options.password
+     * @param {string} options.email
      * @returns {promise} user object
      */
-    async register({ _id, email, password }) {
+    async register({ _id, password, email }) {
       const origId = _id
       _id = _id.toLowerCase()
       try {
@@ -312,6 +312,11 @@ const getDb = (loc, options = {}) => {
 
     /**
      * Login (verify user password).
+     * @param {object} options
+     * @param {string} options._id
+     * @param {string} options.password
+     * @param {string} options.email
+     * @returns {promise} Rejects if bad user or password
      */
     async login({ _id, password, email }) {
       if (!email && _id.indexOf("@") !== -1) email = _id
