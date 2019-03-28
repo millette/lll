@@ -4,7 +4,7 @@
 import test from "ava"
 
 // self
-import getDb from ".."
+import getDb, { rules } from ".."
 import { beforeEach, afterEach } from "./_helpers"
 
 test.beforeEach(beforeEach)
@@ -12,7 +12,7 @@ test.afterEach.always(afterEach)
 
 test("acl get, user required", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
-  const access = { get: Boolean }
+  const access = { get: rules.anyUser }
   const t1 = await db.createTable("bobo", { access })
   await t1.put("joe", "blow")
   t.throwsAsync(t1.get("joe"), { message: "Cannot get." })
@@ -24,7 +24,7 @@ test("acl get, user required", async (t) => {
 
 test("acl put, user required", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
-  const access = { put: Boolean }
+  const access = { put: rules.anyUser }
   const t1 = await db.createTable("bobo", { access })
   t.throwsAsync(t1.put("joe", "blow"), { message: "Cannot put." })
 

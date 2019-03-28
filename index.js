@@ -31,6 +31,13 @@ const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
 const prefixRe = /^[a-z]+$/
 
+// expected arguments: fn(user, k, v) => ...
+// ligne 280...
+const rules = {
+  anyUser: Boolean,
+  userKey: (user, k) => user === k,
+}
+
 const emailUnalias = (email) => {
   const [name, domain] = email.split("@")
   if (!domain) throw new LevelErrors.WriteError("Malformed email.")
@@ -50,6 +57,7 @@ const getDb = (loc, options = {}) => {
   assert.equal(loc && typeof loc, "string", "loc argument must be a string.")
   /** Class representing a table. */
   class Table extends EventEmitter {
+    // FIXME: jsdoc shows $0, $2... instead of names
     /**
      * @param {object} internal.db
      * @param {object} internal.ajv
@@ -268,8 +276,8 @@ const getDb = (loc, options = {}) => {
       }
       if (emailRequired) schema.required.push("email")
       const access = {
-        put: (user, k) => user === k,
-        get: (user, k) => user === k,
+        put: rules.userKey,
+        get: rules.userKey,
       }
       super(parent, "_user", { access, schema })
       this.emails = new EmailTable(parent)
@@ -496,6 +504,8 @@ const getDb = (loc, options = {}) => {
 
   return mkdir(loc).then(open)
 }
+
+getDb.rules = rules
 
 getDb.LevelErrors = LevelErrors
 
