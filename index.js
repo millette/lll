@@ -29,10 +29,9 @@ const leveldownDestroy = promisify(leveldown.destroy)
 const itKeys = ["gt", "gte", "lt", "lte", "start", "end"]
 const POST_END = "\ufff0"
 const defaultAjv = { allErrors: true, verbose: true }
-const prefixRe = /^[a-z]+$/
+const prefixRe = /^([a-z][a-z-]{0,61}[a-z]|[a-z]{1,63})$/
 
 // expected arguments: fn(user, k, v) => ...
-// ligne 280...
 const rules = {
   anyUser: Boolean,
   userKey: (user, k) => user === k,
@@ -95,16 +94,9 @@ const getDb = (loc, options = {}) => {
       this.ajv = ajv
       this.schema = schema
       this.validate = ajv.compile(schema)
-      this.tr = through.obj((chunk, enc, callback) => {
-        // istanbul ignore if
-        if (typeof chunk === "string")
-          return callback(null, this.unprefixed(chunk))
-        // istanbul ignore next
-        if (typeof chunk === "object")
-          return callback(null, { ...chunk, key: this.unprefixed(chunk.key) })
-        // istanbul ignore next
-        callback(new Error("This is not happening!"))
-      })
+      this.tr = through.obj(({ key, value }, enc, callback) =>
+        callback(null, { value, key: this.unprefixed(key) })
+      )
     }
 
     /*
@@ -114,8 +106,6 @@ const getDb = (loc, options = {}) => {
     */
 
     prefixed(k = "") {
-      // istanbul ignore if
-      if (this.db.isClosed()) throw new LevelErrors.OpenError()
       return `${this.name}:${k}`
     }
 
@@ -128,16 +118,16 @@ const getDb = (loc, options = {}) => {
 
     /** Put item in table. */
     async put(k, v, user) {
-      // istanbul ignore if
-      if (this.db.isClosed()) throw new LevelErrors.WriteError()
       if (typeof k === "object") {
         const key = k[this.idKey]
-        // istanbul ignore if
+        // FIXME: necessary precaution?
+        /*
         if (!key) {
           const err = new Error("Missing _id field.")
           err.idKey = this.idKey
           throw err
         }
+        */
         user = v
         v = k
         k = key
@@ -159,9 +149,6 @@ const getDb = (loc, options = {}) => {
 
     /** Get item from table. */
     get(k, user) {
-      // istanbul ignore if
-      if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
-
       return this.db.get(this.prefixed(k)).then((v) => {
         if (this.access && this.access.get && !this.access.get(user, k, v))
           throw new Error("Cannot get.")
@@ -170,15 +157,10 @@ const getDb = (loc, options = {}) => {
     }
 
     _createReadStream(options) {
-      // istanbul ignore if
-      if (this.db.isClosed()) throw new LevelErrors.ReadError("DB is closed.")
       itKeys.forEach((k) => {
-        // istanbul ignore if
         if (options[k]) options[k] = this.prefixed(options[k])
       })
-      // istanbul ignore next
       if (!options.gte) options.gte = this.prefixed()
-      // istanbul ignore next
       if (!options.lte) options.lte = this.prefixed(POST_END)
       return this.db.createReadStream(options)
     }
@@ -258,7 +240,7 @@ const getDb = (loc, options = {}) => {
         properties: {
           _id: {
             type: "string",
-            pattern: "^[a-z][a-z0-9-]{0,61}[a-z0-9]$",
+            pattern: "^([a-z][a-z-]{0,61}[a-z]|[a-z]{1,63})$",
           },
           salt: {
             type: "string",
@@ -443,9 +425,8 @@ const getDb = (loc, options = {}) => {
           "schema argument must be an object."
         )
 
-      // istanbul ignore if
       if (!prefixRe.test(name))
-        throw new Error("name argument must match ^[a-z]+$")
+        throw new LevelErrors.WriteError("Malformed table name.")
 
       if (this.tables.get(name)) throw new Error("Table exists.")
 
@@ -485,7 +466,6 @@ const getDb = (loc, options = {}) => {
       }
 
       db.open(levelOptions, (e) => {
-        // istanbul ignore if
         if (e) return reject(e)
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
@@ -493,11 +473,14 @@ const getDb = (loc, options = {}) => {
             resolve(new DB(db2, reject, new Ajv(ajvOptions), emailRequired))
 
           db2.once("ready", ok)
-          // istanbul ignore next
+          // FIXME: necessary precaution?
+          /*
           db2.once("error", (err) => {
+            console.error('Oh well.....')
             db2.off("ready", ok)
             reject(err)
           })
+          */
         })
       })
     })
