@@ -30,7 +30,7 @@ const checkPassword = ({ password, salt, derivedKey }) =>
         KEYLEN,
         "sha1",
         (err, derivedKeyGen) => {
-          // istanbul ignore next
+          // istanbul ignore if
           if (err) return reject(err)
           derivedKeyGen = derivedKeyGen.toString("hex")
           if (!derivedKey)
@@ -43,11 +43,11 @@ const checkPassword = ({ password, salt, derivedKey }) =>
 
     if (salt && derivedKey) return hashImp(salt)
 
-    // istanbul ignore next
-    if (salt || derivedKey)
-      return reject(new Error("Both salt and derivedKey must be provided."))
+    // FIXME: necessary precaution?
+    // if (salt || derivedKey) return reject(new Error("Both salt and derivedKey must be provided."))
+
     randomBytes(SALTLEN, (err, salt) => {
-      // istanbul ignore next
+      // istanbul ignore if
       if (err) return reject(err)
       hashImp(salt.toString("hex"))
     })
