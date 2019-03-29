@@ -11,23 +11,84 @@ import { beforeEach, afterEach } from "./_helpers"
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
 
+test("bad location", async (t) => {
+  delete t.context
+  return t.throwsAsync(
+    () => getDb("/never/write/here", { errorIfExists: true }),
+    {
+      code: "ENOENT",
+      message: "ENOENT: no such file or directory, mkdir '/never'",
+    }
+  )
+})
+
+test("open same db twice", async (t) => {
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  await db.close()
+  t.pass()
+
+  await t.throwsAsync(() => getDb(t.context.loc, { errorIfExists: true }), {
+    name: "Error",
+    message: `Invalid argument: ${
+      t.context.loc
+    }: exists (error_if_exists is true)`,
+  })
+
+  await db.destroy()
+  t.pass()
+})
+
 test("get table schema", async (t) => {
   const db = await getDb(t.context.loc, { errorIfExists: true })
-
   await db.createTable("bobo")
-
   const table = await db.getTable("bobo")
   t.is(typeof table, "object")
-
   await db.close()
 
   const db2 = await getDb(t.context.loc)
   const table2 = await db2.getTable("bobo")
   t.is(typeof table2, "object")
-
   t.throwsAsync(() => db2.createTable("bobo"), { message: "Table exists." })
 
   await db2.destroy()
+  t.pass()
+})
+
+test("bad table name", async (t) => {
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  await db.createTable("bo-bo")
+  await t.throwsAsync(() => db.createTable("bo bo"), {
+    instanceOf: LevelErrors.WriteError,
+    message: "Malformed table name.",
+  })
+  await t.throwsAsync(() => db.createTable("-bobo"), {
+    instanceOf: LevelErrors.WriteError,
+    message: "Malformed table name.",
+  })
+  await db.destroy()
+  t.pass()
+})
+
+test("early close (1)", async (t) => {
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  await db.close()
+  t.throwsAsync(() => db.createTable("bobo"), {
+    instanceOf: LevelErrors.ReadError,
+    message: "Database is not open",
+  })
+  await db.destroy()
+  t.pass()
+})
+
+test("early close (2)", async (t) => {
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const table = await db.createTable("bobo")
+  await db.close()
+  t.throwsAsync(() => table.put("bobo", "baba"), {
+    instanceOf: LevelErrors.ReadError,
+    message: "Database is not open",
+  })
+  await db.destroy()
   t.pass()
 })
 
@@ -164,10 +225,35 @@ test("table stream", (t) => {
       Promise.all([
         db,
         table1,
+        table2,
         table1.put("it", { want: "more1" }),
-        table2.put("that", { want: "more2" }),
+        table2.put("that", "more2"),
         table1.put("stuff", { want: "more3" }),
       ])
+    )
+    .then(
+      ([db, table, table2]) =>
+        new Promise((resolve) =>
+          table
+            .createReadStream({ gte: "j", lte: "t" })
+            .on("data", ({ key, value }) => {
+              switch (key) {
+                /*
+                case "it":
+                  t.is(value.want, "more1")
+                  break
+                */
+
+                case "stuff":
+                  t.is(value.want, "more3")
+                  break
+
+                default:
+                  t.fail()
+              }
+            })
+            .once("end", () => resolve([db, table2]))
+        )
     )
     .then(
       ([db, table]) =>
@@ -176,12 +262,8 @@ test("table stream", (t) => {
             .createReadStream()
             .on("data", ({ key, value }) => {
               switch (key) {
-                case "it":
-                  t.is(value.want, "more1")
-                  break
-
-                case "stuff":
-                  t.is(value.want, "more3")
+                case "that":
+                  t.is(value, "more2")
                   break
 
                 default:
