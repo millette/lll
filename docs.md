@@ -221,6 +221,7 @@ Verify a password hash.
   - `obj.password` **[string][36]**
   - `obj.salt` **[string][36]**
   - `obj.derivedKey` **[string][36]**
+  - `obj.hash`
 
 Returns **[promise][39]** Rejects on failure
 
