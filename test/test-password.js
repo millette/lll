@@ -90,6 +90,5 @@ test("checkPassword (6)", async (t) =>
       }),
     {
       instanceOf: AssertionError,
-      message: /^Input A expected to strictly equal input B:/,
     }
   ))
