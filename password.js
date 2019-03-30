@@ -76,4 +76,4 @@ const checkPassword = async ({ hash, password, salt, derivedKey }) => {
  */
 const hashPassword = (password) => checkPassword({ password, hash: true })
 
-module.exports = { hashPassword, checkPassword }
+module.exports = { hashPassword, checkPassword, PWMINLEN }
