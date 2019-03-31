@@ -327,25 +327,27 @@ const getDb = (loc, options = {}) => {
   class DB extends EventEmitter {
     /**
      * @param {object} db
-     * @param {function} reject
      * @param {object} ajv
      */
-    constructor(db, reject, ajv, emailRequired) {
+    // constructor(db, reject, ajv, emailRequired) {
+    constructor(db, ajv, emailRequired) {
       assert(
         db instanceof levelup,
         "db argument must be an instance of levelup."
       )
+      /*
       assert.equal(
         typeof reject,
         "function",
         "reject argument must be a function."
       )
+      */
       assert(
         !ajv || ajv instanceof Ajv,
         "ajv argument must be an instance of Ajv."
       )
 
-      db.off("error", reject)
+      // db.off("error", reject)
       super()
       this.db = db
       this.ajv = ajv
@@ -470,7 +472,8 @@ const getDb = (loc, options = {}) => {
         db.close(() => {
           const db2 = levelup(encode(db, { valueEncoding: "json" }))
           const ok = () =>
-            resolve(new DB(db2, reject, new Ajv(ajvOptions), emailRequired))
+            // resolve(new DB(db2, reject, new Ajv(ajvOptions), emailRequired))
+            resolve(new DB(db2, new Ajv(ajvOptions), emailRequired))
 
           db2.once("ready", ok)
           // FIXME: necessary precaution?
