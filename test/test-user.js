@@ -2,9 +2,10 @@
 
 // npm
 import test from "ava"
+import LevelErrors from "level-errors"
 
 // self
-import getDb, { LevelErrors } from ".."
+import getDb from ".."
 import { beforeEach, afterEach } from "./_helpers"
 
 test.beforeEach(beforeEach)

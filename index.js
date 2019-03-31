@@ -12,7 +12,6 @@ const assert = require("assert").strict
 const levelup = require("levelup")
 const leveldown = require("leveldown")
 const encode = require("encoding-down")
-const LevelErrors = require("level-errors")
 const Ajv = require("ajv")
 const mkdir = require("make-dir")
 
@@ -72,7 +71,5 @@ const getDb = (loc, options = {}) => {
 }
 
 getDb.rules = rules
-
-getDb.LevelErrors = LevelErrors
 
 module.exports = getDb
