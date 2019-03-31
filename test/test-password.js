@@ -7,7 +7,7 @@ import { AssertionError } from "assert"
 import test from "ava"
 
 // self
-import { hashPassword, checkPassword, PWMINLEN } from "../password.js"
+import { hashPassword, checkPassword, PWMINLEN } from "../lib/password.js"
 
 test("hashPassword (1)", async (t) =>
   t.throwsAsync(() => hashPassword("1234567"), {

@@ -17,8 +17,8 @@ const Ajv = require("ajv")
 const mkdir = require("make-dir")
 
 // self
-const DB = require("./classes.js")
-const rules = require("./rules.js")
+const DB = require("./lib/db.js")
+const rules = require("./lib/rules.js")
 
 // globals
 const defaultAjv = { allErrors: true, verbose: true }
