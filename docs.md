@@ -3,58 +3,116 @@
 ### Table of Contents
 
 - [lll][1]
-- [getDb][2]
-  - [Parameters][3]
-- [Table][4]
-  - [Parameters][5]
-  - [put][6]
-    - [Parameters][7]
-  - [get][8]
-    - [Parameters][9]
-  - [createReadStream][10]
-    - [Parameters][11]
-- [EmailTable][12]
-  - [Parameters][13]
-- [UserTable][14]
+  - [Parameters][2]
+- [DB][3]
+  - [Parameters][4]
+  - [on][5]
+    - [Parameters][6]
+  - [close][7]
+  - [tablesStream][8]
+  - [getTable][9]
+    - [Parameters][10]
+  - [createTable][11]
+    - [Parameters][12]
+  - [destroy][13]
+- [Table][14]
   - [Parameters][15]
-  - [register][16]
+  - [put][16]
     - [Parameters][17]
-  - [login][18]
+  - [get][18]
     - [Parameters][19]
-- [DB][20]
-  - [Parameters][21]
-  - [on][22]
-    - [Parameters][23]
-  - [close][24]
-  - [tablesStream][25]
-  - [getTable][26]
+  - [createReadStream][20]
+    - [Parameters][21]
+- [UserTable][22]
+  - [Parameters][23]
+  - [register][24]
+    - [Parameters][25]
+  - [login][26]
     - [Parameters][27]
-  - [createTable][28]
-    - [Parameters][29]
-  - [destroy][30]
-- [lll/password][31]
-- [checkPassword][32]
-  - [Parameters][33]
-- [hashPassword][34]
-  - [Parameters][35]
+- [lll/password][28]
+- [checkPassword][29]
+  - [Parameters][30]
+- [hashPassword][31]
+  - [Parameters][32]
+- [EmailTable][33]
+  - [Parameters][34]
 
 ## lll
 
 lll module.
 
-## getDb
+##
 
 Initiate a database.
 
 ### Parameters
 
-- `loc` **[string][36]** database directory location
-- `options` **[object][37]** (optional, default `{}`)
-  - `options.level` **[object][37]**
-  - `options.ajv` **[object][37]**
-  - `options.emailRequired` **[boolean][38]**
+- `loc` **[string][35]** database directory location
+- `options` **[object][36]**
+  - `options.level` **[object][36]**
+  - `options.ajv` **[object][36]**
+  - `options.emailRequired` **[boolean][37]**
 
-Returns **[object][37]** db instance
+Returns **[object][36]** db instance
+
+## DB
+
+**Extends EventEmitter**
+
+Database class.
+
+### Parameters
+
+- `db` **[object][36]**
+- `ajv` **[object][36]**
+- `emailRequired`
+
+### on
+
+Add event listener.
+
+#### Parameters
+
+- `a`
+- `b`
+- `c`
+- `d`
+
+### close
+
+Close database.
+
+### tablesStream
+
+Return stream of tables.
+
+### getTable
+
+Return table by name.
+
+#### Parameters
+
+- `name` **[string][35]**
+
+Returns **[Table][38]**
+
+### createTable
+
+Create table.
+
+#### Parameters
+
+- `name` **[string][35]**
+- `options` **[object][36]** (optional, default `{}`)
+  - `options.schema` **[object][36]**
+  - `options.idKey` **[string][35]**
+  - `options.access` **[object][36]**
+
+Returns **[Table][38]**
+
+### destroy
+
+Destroy database.
 
 ## Table
 
@@ -64,11 +122,11 @@ Class representing a table.
 
 ### Parameters
 
-- `$0` **[Object][37]**
+- `$0` **[Object][36]**
   - `$0.db`
   - `$0.ajv`
-- `name` **[string][36]**
-- `$2` **[Object][37]**
+- `name` **[string][35]**
+- `$2` **[Object][36]**
   - `$2.schema`
   - `$2.idKey` (optional, default `"_id"`)
   - `$2.access`
@@ -100,16 +158,6 @@ Create readable stream.
 
 - `options` (optional, default `{}`)
 
-## EmailTable
-
-**Extends Table**
-
-Class representing the email table.
-
-### Parameters
-
-- `parent`
-
 ## UserTable
 
 **Extends Table**
@@ -127,10 +175,10 @@ Create (register) new user.
 
 #### Parameters
 
-- `options` **[object][37]**
-  - `options._id` **[string][36]**
-  - `options.password` **[string][36]**
-  - `options.email` **[string][36]**
+- `options` **[object][36]**
+  - `options._id` **[string][35]**
+  - `options.password` **[string][35]**
+  - `options.email` **[string][35]**
 
 Returns **[promise][39]** user object
 
@@ -140,72 +188,12 @@ Login (verify user password).
 
 #### Parameters
 
-- `options` **[object][37]**
-  - `options._id` **[string][36]**
-  - `options.password` **[string][36]**
-  - `options.email` **[string][36]**
+- `options` **[object][36]**
+  - `options._id` **[string][35]**
+  - `options.password` **[string][35]**
+  - `options.email` **[string][35]**
 
 Returns **[promise][39]** Rejects if bad user or password
-
-## DB
-
-**Extends EventEmitter**
-
-Database class.
-
-### Parameters
-
-- `db` **[object][37]**
-- `reject` **[function][40]**
-- `ajv` **[object][37]**
-- `emailRequired`
-
-### on
-
-Add event listener.
-
-#### Parameters
-
-- `a`
-- `b`
-- `c`
-- `d`
-
-### close
-
-Close database.
-
-### tablesStream
-
-Return stream of tables.
-
-### getTable
-
-Return table by name.
-
-#### Parameters
-
-- `name` **[string][36]**
-
-Returns **[Table][41]**
-
-### createTable
-
-Create table.
-
-#### Parameters
-
-- `name` **[string][36]**
-- `options` **[object][37]** (optional, default `{}`)
-  - `options.schema` **[object][37]**
-  - `options.idKey` **[string][36]**
-  - `options.access` **[object][37]**
-
-Returns **[Table][41]**
-
-### destroy
-
-Destroy database.
 
 ## lll/password
 
@@ -217,10 +205,10 @@ Verify a password hash.
 
 ### Parameters
 
-- `obj` **[object][37]**
-  - `obj.password` **[string][36]**
-  - `obj.salt` **[string][36]**
-  - `obj.derivedKey` **[string][36]**
+- `obj` **[object][36]**
+  - `obj.password` **[string][35]**
+  - `obj.salt` **[string][35]**
+  - `obj.derivedKey` **[string][35]**
   - `obj.hash`
 
 Returns **[promise][39]** Rejects on failure
@@ -231,48 +219,56 @@ Hash a password.
 
 ### Parameters
 
-- `password` **[string][36]**
+- `password` **[string][35]**
 
 Returns **[promise][39]** Object with salt and derivedKey fields
 
+## EmailTable
+
+**Extends Table**
+
+Class representing the email table.
+
+### Parameters
+
+- `parent`
+
 [1]: #lll
-[2]: #getdb
-[3]: #parameters
-[4]: #table
-[5]: #parameters-1
-[6]: #put
-[7]: #parameters-2
-[8]: #get
-[9]: #parameters-3
-[10]: #createreadstream
-[11]: #parameters-4
-[12]: #emailtable
-[13]: #parameters-5
-[14]: #usertable
-[15]: #parameters-6
-[16]: #register
-[17]: #parameters-7
-[18]: #login
-[19]: #parameters-8
-[20]: #db
-[21]: #parameters-9
-[22]: #on
-[23]: #parameters-10
-[24]: #close
-[25]: #tablesstream
-[26]: #gettable
+[2]: #parameters
+[3]: #db
+[4]: #parameters-1
+[5]: #on
+[6]: #parameters-2
+[7]: #close
+[8]: #tablesstream
+[9]: #gettable
+[10]: #parameters-3
+[11]: #createtable
+[12]: #parameters-4
+[13]: #destroy
+[14]: #table
+[15]: #parameters-5
+[16]: #put
+[17]: #parameters-6
+[18]: #get
+[19]: #parameters-7
+[20]: #createreadstream
+[21]: #parameters-8
+[22]: #usertable
+[23]: #parameters-9
+[24]: #register
+[25]: #parameters-10
+[26]: #login
 [27]: #parameters-11
-[28]: #createtable
-[29]: #parameters-12
-[30]: #destroy
-[31]: #lllpassword
-[32]: #checkpassword
-[33]: #parameters-13
-[34]: #hashpassword
-[35]: #parameters-14
-[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[38]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[28]: #lllpassword
+[29]: #checkpassword
+[30]: #parameters-12
+[31]: #hashpassword
+[32]: #parameters-13
+[33]: #emailtable
+[34]: #parameters-14
+[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[38]: #table
 [39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
-[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-[41]: #table
