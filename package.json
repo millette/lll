@@ -20,7 +20,7 @@
   "dependencies": {
     "ajv": "^6.10.0",
     "ajv-i18n": "^3.4.0",
-    "encoding-down": "^6.0.1",
+    "encoding-down": "^6.0.2",
     "level-errors": "^2.0.0",
     "leveldown": "^5.0.0",
     "levelup": "^4.0.1",
