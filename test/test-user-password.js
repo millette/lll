@@ -143,7 +143,6 @@ test("use token (4)", async (t) => {
 
   await users.register({ _id, password, email })
 
-  // const token = await users.resetPassword({ _id })
   await users.resetPassword({ _id })
   await t.throwsAsync(() => users.useToken({ _id }), {
     message: "Invalid token.",
