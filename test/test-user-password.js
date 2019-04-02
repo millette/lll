@@ -40,7 +40,6 @@ test("reset password (2)", async (t) => {
 
   await users.register({ _id, password, email })
   await users.resetPassword({ _id })
-  t.pass()
 
   await db.destroy()
   t.pass()
@@ -75,10 +74,8 @@ test("use token (2)", async (t) => {
 
   await users.register({ _id, password, email })
 
-  const oy2 = await users.resetPassword({ _id })
-  await users.useToken({ _id, token: oy2, password })
-
-  t.pass()
+  const token = await users.resetPassword({ _id })
+  await users.useToken({ _id, token, password })
 
   await db.destroy()
   t.pass()
