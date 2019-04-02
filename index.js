@@ -20,7 +20,7 @@ const DB = require("./lib/db.js")
 const rules = require("./lib/rules.js")
 
 // globals
-const defaultAjv = { allErrors: true, verbose: true }
+const defaultAjv = { useDefaults: true, allErrors: true, verbose: true }
 
 /**
  * Initiate a database.
