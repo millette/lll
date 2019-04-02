@@ -19,3 +19,7 @@ Implement fastify plugin and simple web server.
 ## Validation schemas
 
 Share json-schemas accross validators.
+
+## Dates
+
+Add automatic `createdAt` and `updatedAt` fields.
