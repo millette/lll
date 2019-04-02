@@ -11,6 +11,23 @@ import { beforeEach, afterEach } from "./_helpers"
 test.beforeEach(beforeEach)
 test.afterEach.always(afterEach)
 
+test("change password", async (t) => {
+  const password = "elPassword"
+  const password2 = "elPassword2"
+  const _id = "b-ob"
+  const email = "joe+666@example.com"
+
+  const db = await getDb(t.context.loc, { errorIfExists: true })
+  const users = db.getUsers()
+
+  await users.register({ _id, password, email })
+  await users.changePassword({ _id, password: password2, email })
+  await users.login({ _id, password: password2 })
+
+  await db.destroy()
+  t.pass()
+})
+
 test("reset password", async (t) => {
   const password = "elPassword"
   const _id = "b-ob"
