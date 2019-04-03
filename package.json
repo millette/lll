@@ -6,6 +6,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "deps": "dependency-check . && dependency-check . --unused --no-dev",
     "docs": "documentation build index.js -f md -o docs.md && prettier --write docs.md",
+    "start": "node server.js",
     "test": "healthier && nyc ava"
   },
   "author": {
