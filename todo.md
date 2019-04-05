@@ -14,7 +14,7 @@ A bit like CouchDB views.
 
 ## Web API
 
-Work on the demo web server has begun. Next, extract as fastify plugin and simple web server.
+Work on the demo web server has begun. Next, extract as fastify plugin and simple web server. See also the `docs-db` projects.
 
 ## Validation schemas
 
