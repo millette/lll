@@ -1,0 +1,23 @@
+server {
+  listen 80;
+  server_name lll;
+
+  access_log /home/millette/lll-demo/log/access.log;
+  error_log /home/millette/lll-demo/log/error.log;
+
+  location / {
+    root /home/millette/lll-demo/dist/;
+    index index.html;
+    # First attempt to serve request as file, then
+    # as directory, then fall back to displaying a 404.
+    try_files $uri $uri/ =404;
+  }
+
+  location /api/ {
+    proxy_pass http://localhost:3000/;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+
