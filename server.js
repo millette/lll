@@ -14,17 +14,35 @@ const getDb = require(".")
 const fastify = require("fastify")({ logger: true })
 const fastifySession = require("fastify-session")
 const MemoryStore = require("memorystore")(fastifySession)
+const envSchema = require("env-schema")
 
 // globals
 const store = new MemoryStore()
-const SESSION_SECRET = "a secret with minimum length of 32 characters"
+
+// config
+const schema = {
+  type: "object",
+  required: ["SESSION_SECRET", "PORT"],
+  properties: {
+    SESSION_SECRET: {
+      type: "string",
+      minLength: 32,
+    },
+    PORT: {
+      type: "integer",
+      default: 3000,
+    },
+  },
+}
+
+const config = envSchema({ schema, dotenv: true })
 // const dev = process.env.NODE_ENV !== "production"
 // const secure = !dev
 
 fastify.register(require("fastify-formbody"))
 fastify.register(require("fastify-cookie"))
 fastify.register(fastifySession, {
-  secret: SESSION_SECRET,
+  secret: config.SESSION_SECRET,
   cookie: { secure: false },
   store,
 })
@@ -92,7 +110,7 @@ fastify.post("/logout", async function(request, reply) {
 // Run the server!
 const start = async () => {
   try {
-    await fastify.listen(3000)
+    await fastify.listen(config.PORT)
     fastify.log.info(`server listening on ${fastify.server.address().port}`)
   } catch (err) {
     fastify.log.error(err)
