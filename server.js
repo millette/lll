@@ -84,6 +84,11 @@ fastify.post("/login", async function(
   return session.username
 })
 
+fastify.post("/logout", async function(request, reply) {
+  delete request.session.username
+  return { logout: true }
+})
+
 // Run the server!
 const start = async () => {
   try {
