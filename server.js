@@ -36,8 +36,6 @@ const schema = {
 }
 
 const config = envSchema({ schema, dotenv: true })
-// const dev = process.env.NODE_ENV !== "production"
-// const secure = !dev
 
 fastify.register(require("fastify-formbody"))
 fastify.register(require("fastify-cookie"))
@@ -91,6 +89,11 @@ fastify.get("/login", async (request, reply) => {
   <label>password <input required type="password" name="password"></label><br>
   <button>Submit</button>
   </form>`
+})
+
+fastify.get("/me", async function({ session: { username } }, reply) {
+  if (username) return { username }
+  throw new Error("I don't know you!")
 })
 
 fastify.post("/login", async function(
