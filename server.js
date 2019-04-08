@@ -10,14 +10,35 @@
 // self
 const getDb = require(".")
 
+// npm
 const fastify = require("fastify")({ logger: true })
+const fastifySession = require("fastify-session")
+const MemoryStore = require("memorystore")(fastifySession)
+
+// globals
+const store = new MemoryStore()
+const SESSION_SECRET = "a secret with minimum length of 32 characters"
+// const dev = process.env.NODE_ENV !== "production"
+// const secure = !dev
 
 fastify.register(require("fastify-formbody"))
+fastify.register(require("fastify-cookie"))
+fastify.register(fastifySession, {
+  secret: SESSION_SECRET,
+  cookie: { secure: false },
+  store,
+})
 
 getDb("web-db").then((db) => fastify.decorate("db", db))
 
 fastify.get("/", async (request, reply) => {
   reply.type("text/html")
+  if (request.session.username) {
+    return `<form method='post' action='/logout'><button>Logout ${
+      request.session.username
+    }</a></form>`
+  }
+
   return `<ol>
   <li><a href="/register">Register</a></li>
   <li><a href="/login">Login</a></li>
@@ -55,11 +76,12 @@ fastify.get("/login", async (request, reply) => {
 })
 
 fastify.post("/login", async function(
-  { body: { password, username: _id } },
+  { session, body: { password, username: _id } },
   reply
 ) {
   const users = this.db.getUsers()
-  return users.login({ _id, password })
+  session.username = await users.login({ _id, password })
+  return session.username
 })
 
 // Run the server!
