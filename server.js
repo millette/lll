@@ -41,7 +41,7 @@ fastify.register(require("fastify-formbody"))
 fastify.register(require("fastify-cookie"))
 fastify.register(fastifySession, {
   secret: config.SESSION_SECRET,
-  cookie: { secure: false },
+  cookie: { secure: false, httpOnly: false },
   store,
 })
 
