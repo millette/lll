@@ -73,13 +73,15 @@ fastify.get("/register", async (request, reply) => {
 })
 
 fastify.post("/register", async function(
-  { body: { password, password2, username: _id, email } },
+  { session, body: { password, password2, username: _id, email } },
   reply
 ) {
   if (!password || !password2) throw new Error("Password required.")
   if (password !== password2) throw new Error("Passwords don't match.")
   const users = this.db.getUsers()
-  return users.register({ _id, password, email })
+  // return users.register({ _id, password, email })
+  session.username = await users.register({ _id, password, email })
+  return session.username
 })
 
 fastify.get("/login", async (request, reply) => {
