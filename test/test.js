@@ -17,7 +17,7 @@ test("bad location", async (t) => {
     () => getDb("/never/write/here", { errorIfExists: true }),
     {
       code: "ENOENT",
-      message: "ENOENT: no such file or directory, mkdir '/never'",
+      message: /^ENOENT: no such file or directory, mkdir/,
     }
   )
 })
