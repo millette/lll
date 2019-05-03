@@ -43,7 +43,7 @@
     "documentation": "^10.1.0",
     "healthier": "^2.0.0",
     "husky": "^2.2.0",
-    "lint-staged": "^8.1.5",
+    "lint-staged": "^8.1.6",
     "nyc": "^14.1.0",
     "prettier": "^1.17.0"
   },
