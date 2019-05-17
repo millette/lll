@@ -42,10 +42,10 @@
     "dependency-check": "^3.3.0",
     "documentation": "^11.0.0",
     "healthier": "^2.0.0",
-    "husky": "^2.2.0",
-    "lint-staged": "^8.1.6",
+    "husky": "^2.3.0",
+    "lint-staged": "^8.1.7",
     "nyc": "^14.1.1",
-    "prettier": "^1.17.0"
+    "prettier": "^1.17.1"
   },
   "lint-staged": {
     "*.{js,json,md}": [
