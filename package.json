@@ -27,7 +27,7 @@
     "fastify": "^2.3.0",
     "fastify-cookie": "^3.0.2",
     "fastify-formbody": "^3.1.0",
-    "fastify-session": "^2.0.1",
+    "fastify-session": "^2.1.0",
     "level-errors": "^2.0.1",
     "leveldown": "^5.0.3",
     "levelup": "^4.0.1",
