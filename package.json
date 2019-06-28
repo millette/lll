@@ -29,8 +29,8 @@
     "fastify-formbody": "^3.1.0",
     "fastify-session": "^3.0.0",
     "level-errors": "^2.0.1",
-    "leveldown": "^5.1.0",
-    "levelup": "^4.0.2",
+    "leveldown": "^5.1.1",
+    "levelup": "^4.1.0",
     "make-dir": "^3.0.0",
     "memorystore": "^1.6.1",
     "through2": "^3.0.1"
