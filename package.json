@@ -23,7 +23,7 @@
     "ajv": "^6.10.0",
     "ajv-i18n": "^3.4.0",
     "encoding-down": "^6.1.0",
-    "env-schema": "^0.1.0",
+    "env-schema": "^1.0.0",
     "fastify": "^2.6.0",
     "fastify-cookie": "^3.0.2",
     "fastify-formbody": "^3.1.0",
