@@ -20,7 +20,7 @@
   },
   "license": "AGPL-3.0",
   "dependencies": {
-    "ajv": "^6.10.0",
+    "ajv": "^6.10.2",
     "ajv-i18n": "^3.4.0",
     "encoding-down": "^6.1.0",
     "env-schema": "^1.0.0",
