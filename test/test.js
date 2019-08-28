@@ -29,9 +29,7 @@ test("open same db twice", async (t) => {
 
   await t.throwsAsync(() => getDb(t.context.loc, { errorIfExists: true }), {
     name: "Error",
-    message: `Invalid argument: ${
-      t.context.loc
-    }: exists (error_if_exists is true)`,
+    message: `Invalid argument: ${t.context.loc}: exists (error_if_exists is true)`,
   })
 
   await db.destroy()
@@ -284,18 +282,21 @@ test("tables stream", (t) => {
     )
     .then(
       ([db]) =>
-        new Promise(async (resolve) => {
+        // new Promise(async (resolve) => {
+        new Promise((resolve) => {
           const ret = []
-          const str = await db.tablesStream()
-          str
-            .on("data", ({ key }) => {
-              ret.push(key)
-              t.pass()
-            })
-            .once("end", () => {
-              t.deepEqual(ret, ["baba", "bobo"])
-              resolve(db)
-            })
+          // const str = await db.tablesStream()
+          db.tablesStream().then((str) => {
+            str
+              .on("data", ({ key }) => {
+                ret.push(key)
+                t.pass()
+              })
+              .once("end", () => {
+                t.deepEqual(ret, ["baba", "bobo"])
+                resolve(db)
+              })
+          })
         })
     )
     .then((db) => db.destroy())
