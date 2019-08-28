@@ -41,7 +41,7 @@
     "coveralls": "^3.0.5",
     "del": "^5.0.0",
     "dependency-check": "^4.1.0",
-    "documentation": "^12.0.1",
+    "documentation": "^12.1.1",
     "healthier": "^3.0.2",
     "husky": "2.7.0",
     "lint-staged": "^9.2.5",
