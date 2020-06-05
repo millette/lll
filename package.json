@@ -37,7 +37,7 @@
     "through2": "^3.0.1"
   },
   "devDependencies": {
-    "ava": "^2.3.0",
+    "ava": "^2.4.0",
     "coveralls": "^3.0.6",
     "del": "^5.1.0",
     "dependency-check": "^4.1.0",
