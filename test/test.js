@@ -16,8 +16,8 @@ test("bad location", async (t) => {
   return t.throwsAsync(
     () => getDb("/never/write/here", { errorIfExists: true }),
     {
-      code: "ENOENT",
-      message: /^ENOENT: no such file or directory, mkdir/,
+      code: "EACCES",
+      message: /^EACCES: permission denied, mkdir/,
     }
   )
 })

@@ -76,7 +76,7 @@ test("checkPassword (5)", async (t) =>
     {
       instanceOf: TypeError,
       message:
-        'The "salt" argument must be one of type string, Buffer, TypedArray, or DataView. Received type number',
+        'The "salt" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received type number (1234)',
     }
   ))
 
